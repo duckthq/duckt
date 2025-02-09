@@ -1,4 +1,4 @@
-(ns server.controllers.customers
+(ns server.api.customers
   (:require
     [ring.util.response :refer [response]]
     [cheshire.core :refer [generate-string]]

@@ -22,13 +22,22 @@
    text])
 
 (defn h3
-  [{:keys [text align]}]
+  ([{:keys [align]} text]
   [:> Title {:order 3
              :align align}
    text])
+  ([text] (h3 {} text)))
+
+(defn h4
+  ([{:keys [align]} text]
+  [:> Title {:order 4
+             :align align}
+   text])
+  ([text] (h4 {} text)))
 
 (defn h5
-  [{:keys [text align]}]
+  ([{:keys [align]} text]
   [:> Title {:order 5
              :align align}
    text])
+  ([text] (h5 {} text)))

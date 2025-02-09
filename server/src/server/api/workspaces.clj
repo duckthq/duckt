@@ -1,4 +1,4 @@
-(ns server.controllers.workspaces
+(ns server.api.workspaces
   (:require
     [ring.util.response :refer [response]]
     [taoensso.telemere :as t]

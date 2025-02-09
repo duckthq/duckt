@@ -5,7 +5,7 @@
             [clojure.core.async :as async]
             [taoensso.telemere :as t]
             [proxy.appconfig :as appconfig]
-            [proxy.mainframe-client :as mainframe-client]
+            [proxy.duckt-server :as duckt-server]
             [clojure.string :as string])
   (:import [java.time Instant ZoneOffset]))
 
@@ -25,7 +25,7 @@
                       :response-time (-> (Instant/now)
                                          (.atZone ZoneOffset/UTC))}]
 
-    (mainframe-client/send-request request-data {:proxy-id (:proxy-id @state)
+    (duckt-server/send-request request-data {:proxy-id (:proxy-id @state)
                                                  :proxy-secret (:proxy-secret @state)})))
 
 (defn proxy-handler [upstream-url]
@@ -76,7 +76,7 @@
                   (throw (ex-info "Proxy token not set" {})))
         splitted-token (string/split token #":")]
     (build-state {:proxy-id (nth splitted-token 1)
-                  :target-url (let [response (mainframe-client/set-alive!
+                  :target-url (let [response (duckt-server/set-alive!
                                                (nth splitted-token 1)
                                                (nth splitted-token 2))]
                                 (-> response :data :target_url))

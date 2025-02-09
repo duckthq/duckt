@@ -1,4 +1,4 @@
-(ns server.controllers.users
+(ns server.api.users
   (:require
     [ring.util.response :refer [response]]
     [taoensso.telemere :as t]))

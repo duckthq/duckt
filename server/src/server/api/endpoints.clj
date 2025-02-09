@@ -1,4 +1,4 @@
-(ns server.controllers.endpoints
+(ns server.api.endpoints
   (:require
     [taoensso.telemere :as t]
     [cheshire.core :refer [generate-string]]

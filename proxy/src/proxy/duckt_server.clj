@@ -1,4 +1,4 @@
-(ns proxy.mainframe-client
+(ns proxy.duckt-server
   (:require [clj-http.client :as http]
             [taoensso.telemere :as t]
             [cheshire.generate :refer [add-encoder]]
@@ -10,12 +10,11 @@
 (add-encoder java.time.Instant cheshire.generate/encode-str)
 (add-encoder java.time.ZonedDateTime cheshire.generate/encode-str)
 
-;; call appconfig/mainframe-url with the request payload
 (defn send-request [request-payload {:keys [proxy-id proxy-secret]}]
-  (t/log! :debug "Sending request to mainframe")
+  (t/log! :debug "Sending request to server")
   (let [body (generate-string request-payload)
         response (http/post
-                   (str appconfig/mainframe-url "/p/requests")
+                   (str appconfig/duckt-server-url "/p/requests")
                    {:body body
                     :accept :json
                     :connection-timeout 1000
@@ -28,7 +27,7 @@
 (defn set-alive! [proxy-id proxy-secret]
   (t/log! :info "Setting myself alive...")
   (let [response (http/post
-                  (str appconfig/mainframe-url "/p/alive")
+                  (str appconfig/duckt-server-url "/p/alive")
                   {:accept :json
                    :connection-timeout 1000
                    :content-type :json

@@ -7,5 +7,5 @@
 (defn -main []
   ;; TODO set it at config level
   (t/set-min-level! :debug)
-  (t/log! :info "Starting Mainframe...")
+  (t/log! :info "Starting Duckt Server...")
   (server/start!))

@@ -2,15 +2,15 @@
   (:require
     [reagent.core :as r]
     [re-frame.core :as rf]
-    ["@mantine/core" :refer [Stack Tabs]]
-    ["@tabler/icons-react" :refer [IconBrandDocker IconServer]]
+    ["@mantine/core" :refer [Stack Group Paper Code]]
+    ["@tabler/icons-react" :refer [IconBrandDocker IconBrandGithub]]
     ["js-confetti" :as JSConfetti]
     [webclient.components.h :as h]))
 
 (defn- docker-installation []
   [:div "Docker"])
 
-(defn- bare-metal-installation []
+(defn- from-source-installation []
   [:div "Bare metal"])
 
 (defn panel []
@@ -28,37 +28,37 @@
             tabs-values [{:label "Docker"
                           :icon IconBrandDocker
                           :value "docker"}
-                         {:label "Bare metal"
-                          :icon IconServer
-                          :value "bare-metal"}]
+                         {:label "From source"
+                          :icon IconBrandGithub
+                          :value "from-source"}]
             tabs-panels [{:label "Docker"
                           :component docker-installation}
-                         {:label "Bare metal"
-                          :component bare-metal-installation}]]
+                         {:label "From source"
+                          :component from-source-installation}]]
       (.addConfetti js-confetti
                     (clj->js {:confettiRadius 2
                               :confettiColors ["#999" "#ddd" "#aaa"]
                               :confettiNumber 3000}))
       [:> Stack {:p :md}
        [h/page-title
-        "New proxy created"
+        "Set up your proxy"
         "Deploy your proxy with the following information."]
        ;; this information is lost when the page is reloaded
-       [:div "New Proxy key: " proxy-key]
-       [:> Tabs {:defaultValue "Docker"}
-        [:> Tabs.List
-         (doall
-           (for [tab tabs-values]
-             ^{:key (:label tab)}
-             [:> Tabs.Tab
-              {:value (:label tab)
-               :leftSection (r/as-element [:> (:icon tab) {:size 20
-                                                           :stroke 1}])}
-              (:label tab)]))]
-        (doall
-          (for [panel tabs-panels]
-            ^{:key (:label panel)}
-            [:> Tabs.Panel
-             {:value (:label panel)
-              :p :sm}
-             [(:component panel)]]))]]))))
+       [:> Stack
+        [h/h3 "Using Docker"]
+        [h/h5 "Pull the image"]
+        [:> Paper {:withBorder true
+                   :p :md}
+         [:> Group
+          [:> IconBrandDocker {:size 20
+                               :stroke 1.5}]
+          [:> Code "docker pull duckthq/proxy"]]]
+        [h/h5 "Run the container"]
+        [:> Paper {:withBorder true
+                   :p :md}
+         [:> Group
+          [:> Code
+           (str "docker run --rm -it -p 4445:4445"
+                " -e DUCKT_SERVER_URL=" "URL"
+                " -e PROXY_TOKEN=" proxy-key " duckthq/proxy")]]]
+        ]]))))

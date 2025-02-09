@@ -1,4 +1,4 @@
-# mainframe
+# Duckt Web App
 
 A [re-frame](https://github.com/day8/re-frame) application designed to ... well, that part is up to
 you.
@@ -46,9 +46,9 @@ you.
     - Created on build with either the [dev](#running-the-app) or [prod](#production) profile
     - `js/compiled/`: compiled CLJS (`shadow-cljs`)
       - Not tracked in source control; see [`.gitignore`](.gitignore)
-* [`src/mainframe/`](src/mainframe/): SPA source files (ClojureScript,
+* [`src/webclient/`](src/webclient/): SPA source files (ClojureScript,
 [re-frame](https://github.com/Day8/re-frame))
-  - [`core.cljs`](src/mainframe/core.cljs): contains the SPA entry point, `init`
+  - [`core.cljs`](src/webclient/core.cljs): contains the SPA entry point, `init`
 * [`.github/workflows/`](.github/workflows/): contains the
 [github actions](https://github.com/features/actions) pipelines.
   - [`test.yaml`](.github/workflows/test.yaml): Pipeline for testing.
@@ -65,7 +65,7 @@ Use your preferred editor or IDE that supports Clojure/ClojureScript development
 2. Install [Node.js](https://nodejs.org/) (JavaScript runtime environment) which should include
    [NPM](https://docs.npmjs.com/cli/npm) or if your Node.js installation does not include NPM also install it.
 4. Install [clj-kondo](https://github.com/borkdude/clj-kondo/blob/master/doc/install.md) (linter)
-5. Clone this repo and open a terminal in the `mainframe` project root directory
+5. Clone this repo and open a terminal in the `Duckt` project root directory
 6. (Optional) Setup [lint cache](https://github.com/borkdude/clj-kondo#project-setup):
     ```sh
     clj-kondo --lint "$(npx shadow-cljs classpath)"
@@ -196,14 +196,14 @@ npx shadow-cljs <action> app
 ```
 ### Debug Logging
 
-The `debug?` variable in [`config.cljs`](src/cljs/mainframe/config.cljs) defaults to `true` in
+The `debug?` variable in [`config.cljs`](src/cljs/webclient/config.cljs) defaults to `true` in
 [`dev`](#running-the-app) builds, and `false` in [`prod`](#production) builds.
 
 Use `debug?` for logging or other tasks that should run only on `dev` builds:
 
 ```clj
-(ns mainframe.example
-  (:require [mainframe.config :as config])
+(ns webclient.example
+  (:require [webclient.config :as config])
 
 (when config/debug?
   (println "This message will appear in the browser console only on dev builds."))

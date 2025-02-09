@@ -19,13 +19,13 @@
     [server.models.users :as users]
     [server.models.proxies :as proxies-model]
     ;; controllers
-    [server.controllers.auth :as auth]
-    [server.controllers.workspaces :as workspaces]
-    [server.controllers.user :as user-ctrl]
-    [server.controllers.proxies :as proxies]
-    [server.controllers.requests :as requests]
-    [server.controllers.endpoints :as endpoints-ctrl]
-    [server.controllers.customers :as customers]))
+    [server.api.auth :as auth]
+    [server.api.workspaces :as workspaces]
+    [server.api.user :as user-ctrl]
+    [server.api.proxies :as proxies]
+    [server.api.requests :as requests]
+    [server.api.endpoints :as endpoints-ctrl]
+    [server.api.customers :as customers]))
 
 ;; Add encoder for java time lib on the responses
 (add-encoder java.time.OffsetDateTime cheshire.generate/encode-str)

@@ -1,4 +1,4 @@
-(ns server.controllers.requests
+(ns server.api.requests
   (:require
     [cheshire.core :as json :refer [generate-string]]
     [clojure.string :as string]

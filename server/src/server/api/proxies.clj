@@ -1,4 +1,4 @@
-(ns server.controllers.proxies
+(ns server.api.proxies
   (:require
     [ring.util.response :refer [response]]
     [buddy.hashers :as buddy]
@@ -25,7 +25,7 @@
                     {:name (:name body)
                      :proxy-key-hash hashed-key
                      :description (:description body)
-                     :host_url (:host-url body)
+                     :host-url (:host-url body)
                      :target-url (:target-url body)})]
     (response {:status "ok"
                :data (merge

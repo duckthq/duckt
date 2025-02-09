@@ -1,17 +1,17 @@
-# Mainframe server
+# Duckt Server
 
 ## Development
 
 1. Install Leiningen: https://leiningen.org/#docs
 
-2. Install a PostgreSQL with a database named `mainframe` and a user `mainframe` with password `mainframe`
+2. Install a PostgreSQL with a database named `duckt` and a user `duckt` with password `duckt`
 ```sh
 # create the user. For development in your local machine, this is ok:
-psql -c "CREATE USER mainframe WITH SUPERUSER PASSWORD 'mainframe';"
+psql -c "CREATE USER duckt WITH SUPERUSER PASSWORD 'duckt';"
 # create the database
-psql -c "CREATE DATABASE mainframe WITH ENCODING='UTF8' OWNER=mainframe;"
+psql -c "CREATE DATABASE duckt WITH ENCODING='UTF8' OWNER=duckt;"
 # make sure your db is in UTC
-psql -c "ALTER DATABASE mainframe SET timezone TO 'UTC';"
+psql -c "ALTER DATABASE duckt SET timezone TO 'UTC';"
 ```
 
 3. Copy the `.env.sample` file to `.env`, it's ready to use with default values, but you can change it if you want.

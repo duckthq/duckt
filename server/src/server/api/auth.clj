@@ -1,4 +1,4 @@
-(ns server.controllers.auth
+(ns server.api.auth
   (:require
     [cheshire.core :refer [generate-string]]
     [buddy.hashers :as buddy]

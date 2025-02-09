@@ -30,6 +30,7 @@
                                (rf/dispatch [:proxies->create
                                              {:name @name
                                               :target-url @target-url
+                                              :host-url @proxy-host
                                               :description @description}]))}
         [:section {:id "new-proxy-content"}
          [:> Grid

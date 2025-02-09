@@ -13,7 +13,7 @@
       {:order-by [[:name :asc]]
        :fields [:id :name :description :target_url :status]})))
 
-(defn create-proxy [workspace-id {:keys [name description
+(defn create-proxy [workspace-id {:keys [name description host-url
                                          target-url proxy-key-hash]}]
   (t/log! :debug (str "Creating proxy model for " workspace-id))
   (with-open [conn (db/connection)]
@@ -24,6 +24,7 @@
                         :proxy_key_hash proxy-key-hash
                         :status "offline"
                         :description description
+                        :host_url host-url
                         :target_url target-url}]
                       {:returning [:id :name :description :target_url]})]
       new-proxy)))
@@ -67,7 +68,3 @@
       conn :proxies
       {:id proxy-id
        :workspace_id workspace-id})))
-
-(defn set-proxy-alive [proxy-id workspace-id]
-  (t/log! :debug (str "Setting proxy alive for " proxy-id))
-  (update-proxy-status proxy-id "online"))
