@@ -1,6 +1,8 @@
-(defproject duckt-server "0.1.0-SNAPSHOT"
+(defproject duckt-server "0.0.1-UNSTABLE"
   :description ""
   :url "https://duckt.dev"
+  :license {:name "AGPL-3.0"
+            :url "https://www.gnu.org/licenses/agpl-3.0.en.html"}
   :dependencies [[org.clojure/clojure "1.11.1"]
                  [org.clojure/core.async "1.6.681"]
                  [environ "1.2.0"]
@@ -25,7 +27,7 @@
                  [ring/ring-json "0.5.1"]
                  [ring/ring-jetty-adapter "1.9.6"]]
   :plugins [[lein-environ "1.2.0"]]
-  :main ^:skip-aot server.core
+  :main server.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all
                        :jvm-opts ["-Dclojure.compiler.direct-linking=true"]}})

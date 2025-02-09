@@ -1,8 +1,8 @@
-(defproject proxy "0.1.0-SNAPSHOT"
+(defproject proxy "0.0.1-UNSTABLE"
   :description ""
   :url "https://duckt.dev"
-  :license {:name "EPL-2.0 OR GPL-2.0-or-later WITH Classpath-exception-2.0"
-            :url "https://www.eclipse.org/legal/epl-2.0/"}
+  :license {:name "AGPL-3.0"
+            :url "https://www.gnu.org/licenses/agpl-3.0.en.html"}
   :dependencies [[org.clojure/clojure "1.11.1"]
                  [cider/cider-nrepl "0.42.1"]
                  [aleph "0.8.2"]
