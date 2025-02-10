@@ -49,8 +49,11 @@
                        (.-ctrlKey e)))
           (.open spotlight))))
     (fn []
-      [:div {:id "topbar"
-             :class "topbar"}
+      [:> Box {:id "topbar"
+               :style {:z-index 2}
+               :top 0
+               :left 0
+               :class "topbar"}
        [:> Spotlight {:actions spotlight-actions}]
        [:> Box {:px "sm"
                 :py "md"}

@@ -10,7 +10,7 @@
    [sidebar/main]
    ;; main container
    [:> Box {:ml "250px"
-            :h "100vh"}
+            :mih "100vh"}
     [topbar/main]
     [:> Box {:p 0
              :pos "relative"

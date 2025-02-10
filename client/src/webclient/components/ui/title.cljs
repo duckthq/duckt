@@ -17,28 +17,37 @@
 
 (defn h1
   ([{:keys [align]} text]
-  [:> Title {:order 1
-             :align align}
-   text])
+   [:> Title {:order 1
+              :align align}
+    text])
   ([text] [h1 {} text]))
 
+(defn h2
+  ([props text]
+   [:> Title (merge
+               props
+               {:order 2})
+    text])
+  ([text] [h2 {} text]))
+
 (defn h3
-  ([{:keys [align]} text]
-  [:> Title {:order 3
-             :align align}
-   text])
+  ([props text]
+   [:> Title (merge
+               props
+               {:order 3})
+    text])
   ([text] [h3 {} text]))
 
 (defn h4
-  ([{:keys [align]} text]
-  [:> Title {:order 4
-             :align align}
-   text])
+  ([props text]
+   [:> Title
+    (merge props {:order 4})
+    text])
   ([text] [h4 {} text]))
 
 (defn h5
   ([{:keys [align]} text]
-  [:> Title {:order 5
-             :align align}
-   text])
+   [:> Title {:order 5
+              :align align}
+    text])
   ([text] [h5 {} text]))

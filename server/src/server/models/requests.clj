@@ -172,6 +172,7 @@
           options {:fields [:id, :type, :url, :uri, :elapsed_time,
                             :request_headers, :response_headers,
                             :status_code, :endpoint_id, :customer_id
+                            :query_params
                             :method, :response_time, :created_at]}
           request (pg-honey/find-first conn :requests query options)]
       request)))
