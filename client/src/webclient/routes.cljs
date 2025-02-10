@@ -20,6 +20,7 @@
                  [["/" :proxy-id "/overview"] :proxy-overview]
                  [["/" :proxy-id "/requests"] :proxy-requests]
                  [["/" :proxy-id "/customers"] :proxy-customers]
+                 [["/" :proxy-id "/settings"] :proxy-settings]
                  [["/" :proxy-id "/requests/" :request-id] :request-details]
                  ["" :proxies]]
       "signup" :signup

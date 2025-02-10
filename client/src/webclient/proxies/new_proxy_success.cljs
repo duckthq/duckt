@@ -2,16 +2,12 @@
   (:require
     [reagent.core :as r]
     [re-frame.core :as rf]
-    ["@mantine/core" :refer [Stack Group Paper Code]]
-    ["@tabler/icons-react" :refer [IconBrandDocker IconBrandGithub]]
+    ["@mantine/core" :refer [Stack Group Paper Code Anchor]]
+    ["@tabler/icons-react" :refer [IconBrandDocker IconBrandGithubFilled]]
     ["js-confetti" :as JSConfetti]
-    [webclient.components.h :as h]))
-
-(defn- docker-installation []
-  [:div "Docker"])
-
-(defn- from-source-installation []
-  [:div "Bare metal"])
+    [webclient.components.h :as h]
+    [webclient.components.ui.anchor :as anchor]
+    [webclient.components.ui.text :as text]))
 
 (defn panel []
   (let [new-proxy-info (rf/subscribe [:proxies->new-proxy-info])
@@ -24,17 +20,7 @@
                         ":"
                         (:id @new-proxy-info)
                         ":"
-                        (:proxy-key @new-proxy-info))
-            tabs-values [{:label "Docker"
-                          :icon IconBrandDocker
-                          :value "docker"}
-                         {:label "From source"
-                          :icon IconBrandGithub
-                          :value "from-source"}]
-            tabs-panels [{:label "Docker"
-                          :component docker-installation}
-                         {:label "From source"
-                          :component from-source-installation}]]
+                        (:proxy-key @new-proxy-info))]
       (.addConfetti js-confetti
                     (clj->js {:confettiRadius 2
                               :confettiColors ["#999" "#ddd" "#aaa"]
@@ -43,16 +29,17 @@
        [h/page-title
         "Set up your proxy"
         "Deploy your proxy with the following information."]
-       ;; this information is lost when the page is reloaded
        [:> Stack
         [h/h3 "Using Docker"]
         [h/h5 "Pull the image"]
         [:> Paper {:withBorder true
                    :p :md}
          [:> Group
-          [:> IconBrandDocker {:size 20
-                               :stroke 1.5}]
-          [:> Code "docker pull duckthq/proxy"]]]
+          [:> IconBrandDocker {:size 24
+                               :color "var(--mantine-color-blue-7)"
+                               :stroke 1}]
+          [:> Code
+           "docker pull duckthq/proxy"]]]
         [h/h5 "Run the container"]
         [:> Paper {:withBorder true
                    :p :md}
@@ -61,4 +48,18 @@
            (str "docker run --rm -it -p 4445:4445"
                 " -e DUCKT_SERVER_URL=" "URL"
                 " -e PROXY_TOKEN=" proxy-key " duckthq/proxy")]]]
-        ]]))))
+        ]
+       [:> Stack
+        [h/h3 "Build from source"]
+        [:> Group
+         [anchor/Dark {:href "https://github.com/duckthq/duckt/tree/main/proxy"
+                       :target "_blank"
+                       :inherit true}
+          [:> Paper {:withBorder true
+                     :p :md}
+           [:> Stack
+            [:> Group {:gap :xs}
+             [:> IconBrandGithubFilled {:size 20}]
+             [h/h5 "GitHub"]]
+            [text/Base
+             "Visit our GitHub repository to build the proxy from source."]]]]]]]))))

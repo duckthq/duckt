@@ -8,11 +8,9 @@
     ;; get url search params to apply filters in the api call
     (let [search (.. js/window -location -search)
          url-search-params (new js/URLSearchParams search)
-         _ (println "url-search-params" url-search-params)
          url-params-list (js->clj (for [q url-search-params] q))
          url-params-map (into (sorted-map) url-params-list)
-         query-params (merge url-params-map params)
-          _ (println "query-params" query-params)]
+         query-params (merge url-params-map params)]
 
       {:fetch {:uri (str "/proxies/" proxy-id "/requests")
                :method "GET"
@@ -68,6 +66,26 @@
     (assoc-in db
               [:requests->timeframe :data (keyword (:status-code-group requests))]
               requests)))
+
+(rf/reg-event-fx
+  :requests->get-request-details
+  (fn [{:keys [db]} [_ request-id]]
+    {:fetch {:uri (str "/requests/" request-id)
+             :method "GET"
+             :success-fx [:requests->set-request-details]}
+     :db (assoc db :requests->request-details {:loading? true
+                                               :data (-> db :requests->request-details :data)})}))
+
+(rf/reg-event-db
+  :requests->set-request-details
+  (fn [db [_ request-details]]
+    (assoc db :requests->request-details {:loading? false
+                                          :data (:data request-details)})))
+
+(rf/reg-sub
+  :requests->request-details
+  (fn [db _]
+    (:requests->request-details db)))
 
 (rf/reg-sub
   :requests->timeframe

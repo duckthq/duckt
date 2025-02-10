@@ -29,12 +29,17 @@
                       {:returning [:id :name :description :target_url]})]
       new-proxy)))
 
-(defn get-proxy-by-id [proxy-id]
+(defn get-proxy [workspace-id proxy-id]
   (t/log! :debug (str "Getting proxy model by id " proxy-id))
   (with-open [conn (db/connection)]
-    (pg-honey/get-by-id
+    (pg-honey/find-first
       conn :proxies
-      proxy-id)))
+      {:workspace_id workspace-id
+       :id proxy-id}
+      {:fields [:id :name :description
+                :target_url :host_url :status]})))
+
+
 
 (defn update-proxy-status [workspace-id proxy-id status]
   (t/log! :debug (str "Updating proxy status for " proxy-id))
@@ -68,3 +73,11 @@
       conn :proxies
       {:id proxy-id
        :workspace_id workspace-id})))
+
+;; Used for proxy authentication
+(defn get-proxy-by-id [proxy-id]
+  (t/log! :debug (str "Getting proxy model by id " proxy-id))
+  (with-open [conn (db/connection)]
+    (pg-honey/get-by-id
+      conn :proxies
+      proxy-id)))

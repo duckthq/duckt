@@ -15,8 +15,7 @@
               :border-right "1px solid var(--mantine-color-gray-1)"
               :max-width "250px"
               :height "100vh"}
-   [:.sidebar-content {:background "var(--mantine-color-gray-1)"
-                       :height "100vh"
+   [:.sidebar-content {:height "100vh"
                        :width "100%"}]])
 (def topbar
   [:.topbar {:position "sticky"

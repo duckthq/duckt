@@ -1,4 +1,4 @@
-(ns webclient.components.h
+(ns webclient.components.ui.title
   (:require
     ["@mantine/core" :refer [Title Text Stack]]
     [webclient.components.ui.text :as text]))
@@ -16,28 +16,29 @@
       description])])
 
 (defn h1
-  [{:keys [text align]}]
+  ([{:keys [align]} text]
   [:> Title {:order 1
-             :align (or align "left")}
+             :align align}
    text])
+  ([text] [h1 {} text]))
 
 (defn h3
   ([{:keys [align]} text]
   [:> Title {:order 3
              :align align}
    text])
-  ([text] (h3 {} text)))
+  ([text] [h3 {} text]))
 
 (defn h4
   ([{:keys [align]} text]
   [:> Title {:order 4
              :align align}
    text])
-  ([text] (h4 {} text)))
+  ([text] [h4 {} text]))
 
 (defn h5
   ([{:keys [align]} text]
   [:> Title {:order 5
              :align align}
    text])
-  ([text] (h5 {} text)))
+  ([text] [h5 {} text]))

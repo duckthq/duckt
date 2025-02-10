@@ -32,6 +32,26 @@
     {:navigate [:new-proxy-success]
      :db (assoc db :proxies->new-proxy-info (:data payload))}))
 
+(rf/reg-event-fx
+  :proxies->get-by-id
+  (fn [{:keys [db]} [_ proxy-id]]
+    {:fetch {:uri (str "/proxies/" proxy-id)
+             :method "GET"
+             :success-fx [:proxies->set-by-id]}
+     :db (assoc db :proxies->proxy-info {:loading? true
+                                         :data (-> db :proxies->proxy-info :data)})}))
+
+(rf/reg-event-db
+  :proxies->set-by-id
+  (fn [db [_ proxy-info]]
+    (assoc db :proxies->proxy-info {:loading? false
+                                    :data (:data proxy-info)})))
+
+(rf/reg-sub
+  :proxies->proxy-info
+  (fn [db _]
+    (:proxies->proxy-info db)))
+
 (rf/reg-sub
   :proxies->new-proxy-info
   (fn [db _]

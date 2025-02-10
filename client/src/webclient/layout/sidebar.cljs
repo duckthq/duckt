@@ -5,8 +5,9 @@
     ["@tabler/icons-react" :refer [IconChevronDown IconCirclePlus IconCheck IconChartHistogram
                                    IconHome IconAffiliate IconUsers
                                    IconSettings IconListTree]]
-    ["@mantine/core" :refer [Stack Group Box Text Menu
-                             NavLink Divider Tooltip Anchor]]
+    ["@mantine/core" :refer [Stack Group Box Text Menu Image
+                             NavLink Divider Tooltip Anchor
+                             useMantineTheme]]
     [webclient.routes :as routes]))
 
 (defn- workspaces-menu-dropdown []
@@ -99,7 +100,7 @@
                         :leftSection (r/as-element [:> IconListTree
                                                     {:size 16
                                                      :stroke "1.5"}])}]
-           [:> NavLink {:href (routes/url-for :proxy
+           (comment [:> NavLink {:href (routes/url-for :proxy
                                               {:id (:id p)})
                         :label "Users"
                         :variant :light
@@ -107,10 +108,9 @@
                         :color :gray
                         :leftSection (r/as-element [:> IconUsers
                                                     {:size 16
-                                                     :stroke "1.5"}])}]
+                                                     :stroke "1.5"}])}])
            [:> Divider]
-           [:> NavLink {:href (routes/url-for :proxy
-                                              {:id (:id p)})
+           [:> NavLink {:href (routes/url-for :proxy-settings {:proxy-id (:id p)})
                         :label "Settings"
                         :variant :light
                         :styles {:root {:border-radius "var(--mantine-radius-md)"}}
@@ -121,7 +121,9 @@
 
 (defn main []
   (let [user (rf/subscribe [:user->userinfo])
-        workspaces (rf/subscribe [:workspaces])]
+        workspaces (rf/subscribe [:workspaces])
+        ;theme (js->clj (useMantineTheme) :keywordize-keys true)
+        ]
     (rf/dispatch [:workspaces->get])
     (fn []
       (let [selected-workspace (first
@@ -132,7 +134,8 @@
                                          @workspaces))]
         [:div {:id "sidebar"
                :class "sidebar"}
-         [:div {:class [:sidebar-content]}
+         [:> Box {:class [:sidebar-content]
+                  :bg "gray.1"}
           [:> Stack
            [:> Menu {:shadow :md
                      :withArrow true}
@@ -142,8 +145,11 @@
                         :pt "md"
                         :mb "md"
                         :align :center}
-              [:figure {:class "w-10"}
-               [:img {:src "/images/brand/icon-black-white.svg"}]]
+              [:> Box {:w "36px"}
+               [:> Image
+                {:src "/images/brand/icon-black-white.svg"
+                 :fit :contain
+                 :w "100%"}]]
               [:> Box {:style {:flexGrow 1}}
                [:> Group {:gap :xs}
                 [:> Box {:maw "120px"
@@ -160,10 +166,7 @@
            [:> Stack {:p :xs}
             [:> NavLink {:href (routes/url-for :home)
                          :label "Home"
-                         :styles {:root {:border-radius "var(--mantine-radius-md)"}
-                                  :label {:color "var(--mantine-color-gray-8)"}
-                                  :section {:color "var(--mantine-color-gray-8)"}}
-                         :color :gray
+                         :styles {:root {:border-radius "var(--mantine-radius-md)"}}
                          :variant :light
                          ;:active true
                          :leftSection (r/as-element [:> IconHome

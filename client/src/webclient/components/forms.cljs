@@ -4,7 +4,7 @@
 
 (defn input-field
   [{:keys [placeholder type on-change required error
-           label description input-name id]}]
+           label description input-name id defaultValue]}]
   [:> TextInput (merge
                   (when on-change {:onChange on-change})
                   (when required {:required true
@@ -13,6 +13,7 @@
                   {:placeholder placeholder
                    :id id
                    :label label
+                   :defaultValue defaultValue
                    :name input-name
                    :variant "filled"
                    :size "md"
@@ -23,7 +24,8 @@
 
 (defn textarea-field
   [{:keys [placeholder on-change required error
-           label description input-name id]}]
+           label description input-name id
+           defaultValue]}]
   [:> Textarea (merge
                   (when on-change {:onChange on-change})
                   (when required {:required true
@@ -33,6 +35,7 @@
                    :id id
                    :label label
                    :name input-name
+                   :defaultValue defaultValue
                    :variant "filled"
                    :size "md"
                    :multiline true

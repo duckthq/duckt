@@ -3,9 +3,7 @@
     [re-frame.core :as rf]
     [bidi.bidi :as bidi]
     ["@mantine/core" :refer [MantineProvider createTheme
-                             Container virtualColor
-                             NavLink]]
-    ["@mantine/colors-generator" :refer [generateColors]]
+                             Container NavLink Anchor]]
     [webclient.styles :as styles]
     [webclient.events.core]
     [webclient.routes :as routes]
@@ -18,6 +16,7 @@
     [webclient.proxies.new-proxy-success :as new-proxy-success]
     [webclient.proxies.overview.panel :as proxy-overview-panel]
     [webclient.proxies.requests.panel :as proxy-requests-panel]
+    [webclient.proxies.settings.panel :as proxy-settings-panel]
     [webclient.proxies.request-details.panel :as request-details]
     [webclient.home.panel :as home-panel]
     [webclient.endpoints.requests.panel :as endpoint-requests-panel]))
@@ -31,12 +30,15 @@
 (defmethod routes/panels :new-proxy-success-panel []
   (set! (.-title js/document) "New Proxy")
   [application/layout [new-proxy-success/panel]])
+
 (defmethod routes/panels :request-details-panel []
+  (set! (.-title js/document) "Request Details")
   (let [pathname (.. js/window -location -pathname)
         current-route (bidi/match-route @routes/routes pathname)
+        proxy-id (-> current-route :route-params :proxy-id)
         request-id (-> current-route :route-params :request-id)]
 
-  [application/layout [request-details/main request-id]]))
+  [application/layout [request-details/main proxy-id request-id]]))
 
 (defmethod routes/panels :proxy-overview-panel []
   (set! (.-title js/document) "Overview")
@@ -47,6 +49,7 @@
   [application/layout [proxy-overview-panel/main proxy-id]]))
 
 (defmethod routes/panels :proxy-requests-panel []
+  (set! (.-title js/document) "Requests")
   (let [pathname (.. js/window -location -pathname)
         current-route (bidi/match-route @routes/routes pathname)
         proxy-id (-> current-route :route-params :proxy-id)]
@@ -54,11 +57,20 @@
   [application/layout [proxy-requests-panel/main proxy-id]]))
 
 (defmethod routes/panels :proxy-customers-panel []
+  (set! (.-title js/document) "Customers")
   (let [pathname (.. js/window -location -pathname)
         current-route (bidi/match-route @routes/routes pathname)
         proxy-id (-> current-route :route-params :proxy-id)]
 
   [application/layout [proxy-requests-panel/main proxy-id]]))
+
+(defmethod routes/panels :proxy-settings-panel []
+  (set! (.-title js/document) "Proxy settings")
+  (let [pathname (.. js/window -location -pathname)
+        current-route (bidi/match-route @routes/routes pathname)
+        proxy-id (-> current-route :route-params :proxy-id)]
+
+  [application/layout [proxy-settings-panel/main proxy-id]]))
 
 (defmethod routes/panels :endpoint-requests-panel []
   (let [pathname (.. js/window -location -pathname)
@@ -71,25 +83,17 @@
 (defmethod routes/panels :signup-panel [] [signup/panel])
 
 (def mantine-theme
-  #js {:fontFamily "Open Sans, sans-serif"
-       :defaultRadius "md"
+  #js {:defaultRadius "md"
        :primaryColor "gray"
-       :headings #js {:sizes #js{:h3 #js {:fontWeight "400"}}}
-       :colors #js {"primary-blue" (generateColors "#1746A2")
-                    :dark-blue (virtualColor
-                                 #js {:name "dark-blue"
-                                      :dark "#001340"
-                                      :light "#FAFAFA"})
-                    :primary (virtualColor
-                               #js {:name "primary"
-                                    :dark "#1746A2"
-                                    :light "#FAFAFA"})}
+       :headings (clj->js {:sizes {:h3 {:fontWeight "400"}}})
        :white "#FAFAFA"
-       ;; TODO: see why this doesn't work later
+       :black "#363738"
+       :cursorType :pointer
        :components {"NavLink"
                     (.extend
                       NavLink
                       {:vars (fn [_ props]
+                               (js/console.log "props" props)
                                (if (= "gray" (.-color props))
                                  {"root" {"--nl-hover" "var(--mantine-color-gray-8)"}}
                                  {"root" {"--nl-hover" "red"}}))})}})
@@ -102,6 +106,7 @@
     (rf/dispatch [:serverinfo->get])
     (fn []
       [:> MantineProvider {:defaultColorScheme @theme
+                           :forceColorScheme :light
                            :theme (createTheme mantine-theme)}
        [:> Container {:fluid true
                       :p "0"

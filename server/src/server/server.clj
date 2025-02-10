@@ -110,6 +110,10 @@
   (GET "/proxies" []
        (routes-handler
          proxies/get-proxies))
+  (GET "/proxies/:proxy-id" [proxy-id]
+       (routes-handler
+         proxies/get-proxy-by-id
+         {:proxy-id proxy-id}))
   (GET "/proxies/:proxy-id/requests" [proxy-id]
        (routes-handler
          requests/get-requests-by-proxy-id
@@ -118,9 +122,10 @@
        (routes-handler
          requests/get-timeframe-requests-by-proxy
          {:proxy-id proxy-id}))
+
   (GET "/proxies/:proxy-id/requests/:request-id" [proxy-id request-id]
        (routes-handler
-         requests/get-request-by-id
+         requests/get-one
          {:proxy-id proxy-id
           :request-id request-id}))
   (POST "/proxies" []
@@ -137,10 +142,11 @@
 
   (GET "/requests" [] (routes-handler
                           requests/get-requests))
-  ;(GET "/endpoints/:endpoint-id/requests" [endpoint-id]
-  ;     (routes-handler
-  ;       requests/get-requests-by-endpoint-id
-  ;       {:endpoint-id endpoint-id}))
+
+  (GET "/requests/:request-id" [request-id]
+       (routes-handler
+         requests/get-one
+         {:request-id request-id}))
 
   (GET "/endpoints" []
        (routes-handler

@@ -13,6 +13,15 @@
     (response {:status "ok"
                :data proxies})))
 
+(defn get-proxy-by-id [req params & _]
+  (t/log! :debug "Getting proxy by id")
+  (let [context (:context req)
+        proxy-id (:proxy-id params)
+        selected-workspace (-> context :user-preferences :selected_workspace)]
+    (response {:status "ok"
+               :data (proxies/get-proxy selected-workspace proxy-id)})))
+
+
 (defn create-proxy [req & _]
   (t/log! :debug "Creating proxy")
   (let [context (:context req)

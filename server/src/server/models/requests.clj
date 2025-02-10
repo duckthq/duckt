@@ -164,11 +164,10 @@
             requests (pg-honey/execute conn query params)]
         {:list requests}))))
 
-(defn get-request-by-id [{:keys [request-id proxy-id workspace-id]}]
+(defn get-request-by-id [{:keys [request-id workspace-id]}]
   (t/log! :debug "Getting request by id")
   (with-open [conn (db/connection)]
     (let [query {:id request-id
-                 :proxy_id proxy-id
                  :workspace_id workspace-id}
           options {:fields [:id, :type, :url, :uri, :elapsed_time,
                             :request_headers, :response_headers,

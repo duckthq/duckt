@@ -67,13 +67,11 @@
     (response {:status "ok"
                :data requests})))
 
-(defn get-request-by-id [req params & _]
+(defn get-one [req params & _]
   (let [context (:context req)
         request-id (:request-id params)
-        proxy-id (:proxy-id params)
         request (requests/get-request-by-id
                   {:request-id request-id
-                   :proxy-id proxy-id
                    :workspace-id (-> context
                                      :user-preferences
                                      :selected_workspace)})]
