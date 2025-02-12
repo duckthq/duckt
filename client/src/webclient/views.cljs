@@ -4,6 +4,7 @@
     [bidi.bidi :as bidi]
     ["@mantine/core" :refer [MantineProvider createTheme
                              Container NavLink Anchor]]
+    ["@mantine/notifications" :refer [Notifications]]
     [webclient.styles :as styles]
     [webclient.events.core]
     [webclient.routes :as routes]
@@ -108,6 +109,7 @@
       [:> MantineProvider {:defaultColorScheme @theme
                            :forceColorScheme :light
                            :theme (createTheme mantine-theme)}
+       [:> Notifications]
        [:> Container {:fluid true
                       :p "0"
                       :h "100%"}

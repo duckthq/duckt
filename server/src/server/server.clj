@@ -135,6 +135,11 @@
        (routes-handler
          proxies/update-proxy-by-id
          {:proxy-id proxy-id}))
+  (POST "/proxies/:proxy-id/generate-key" [proxy-id]
+       (routes-handler
+         proxies/generate-proxy-key
+         {:proxy-id proxy-id}))
+
   (DELETE "/proxies/:proxy-id" [proxy-id]
           (routes-handler
             proxies/delete-proxy-by-id

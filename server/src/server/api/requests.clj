@@ -62,7 +62,7 @@
                           :order (get query-params "order") ;; :asc or :desc
                           :customer-id (get query-params "customer_id")
                           :endpoint-id (get query-params "endpoint_id")
-                          :limit (or (get query-params "limit") 20)
+                          :limit (or (get query-params "limit") 50)
                           :offset (or (get query-params "offset") 0)})]
     (response {:status "ok"
                :data requests})))

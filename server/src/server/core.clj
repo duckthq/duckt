@@ -6,6 +6,6 @@
 
 (defn -main []
   ;; TODO set it at config level
-  (t/set-min-level! :debug)
+  (t/set-min-level! :info)
   (t/log! :info "Starting Duckt Server...")
   (server/start!))

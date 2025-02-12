@@ -5,7 +5,6 @@
 (rf/reg-event-fx
   :requests->get-by-proxy-id
   (fn [{:keys [db]} [_ proxy-id params]]
-    ;; get url search params to apply filters in the api call
     (let [search (.. js/window -location -search)
          url-search-params (new js/URLSearchParams search)
          url-params-list (js->clj (for [q url-search-params] q))

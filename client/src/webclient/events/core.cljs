@@ -1,6 +1,7 @@
 (ns webclient.events.core
   (:require
     [re-frame.core :as rf]
+    ["@mantine/notifications" :refer [notifications]]
     ;; events registration
     [webclient.events.auth]
     [webclient.events.serverinfo]
@@ -10,6 +11,7 @@
     [webclient.events.hosts]
     [webclient.events.requests]
     [webclient.events.endpoints]
+    [webclient.events.notifications]
     ;; end events registration
     ;; internal
     [webclient.config :as config]
@@ -36,8 +38,14 @@
     (:theme db)))
 
 (rf/reg-fx
+  :notification
+  (fn [props]
+  (.show notifications (clj->js props))))
+
+(rf/reg-fx
   :fetch
-  (fn [{:keys [method uri query-params body success-fx failure-fx headers]}]
+  (fn [{:keys [method uri query-params body success-fx failure-fx headers
+               success-fxs]}]
     (let [json-body (.stringify js/JSON (clj->js body))
           query-params-parser #(let [url-search-params (new js/URLSearchParams (clj->js %))]
                                  (if (and (seq (.toString url-search-params)) %)
@@ -47,6 +55,7 @@
                    (when (= status 401) (let [_ (rf/dispatch [:auth->logout])]))
                    (when (> status 399) (on-failure)))
           req-headers (clj->js (merge {:Accept "application/json"
+                                       :duckt-user-id (js/localStorage.getItem "userEmail")
                                        :Content-Type "application/json"}
                                       headers))]
       ;; fetch the API
@@ -65,15 +74,16 @@
                   (.then
                     (fn [json]
                       (let [payload (js->clj json :keywordize-keys true)]
-                        ;(println "API response" payload)
                         (when (not (.-ok response))
-                          (println "API response not ok" response)
                           (not-ok {:status (.-status response)
                                    :on-failure #(throw (js/Error. (js/JSON.stringify json)))}))
                         ;; maps every success-fx to a dispatch
                         (mapv
                           #(rf/dispatch [% payload (.-headers response)])
-                          success-fx)))))))
+                          success-fx)
+                        (mapv
+                          #(rf/dispatch (vec (flatten [% payload (.-headers response)])))
+                          success-fxs)))))))
           ;; request error handling
           (.catch
             (fn [error]

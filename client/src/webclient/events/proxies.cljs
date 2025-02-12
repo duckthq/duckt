@@ -7,7 +7,7 @@
   (fn [{:keys [db]} _]
     {:fetch {:uri "/proxies"
              :method "GET"
-             :success-fx [:proxies->set]}
+             :success-fxs [[:proxies->set]]}
      :db (assoc db :proxies {:loading? true
                              :data (-> db :proxies :data)})}))
 
@@ -23,8 +23,27 @@
     {:fetch {:uri "/proxies"
              :method "POST"
              :body new-proxy
-             :success-fx [:proxies->get
-                          :proxies->create-success]}}))
+             :success-fxs [[:proxies->get]
+                           [:proxies->create-success]]}}))
+
+(rf/reg-event-fx
+  :proxies->update
+  (fn [_ [_ proxy-id proxy-info]]
+    {:fetch {:uri (str "/proxies/" proxy-id)
+             :method "PUT"
+             :body proxy-info
+             :success-fxs [[:proxies->get]
+                           [:notifications->success {:title "Proxy updated!"
+                                                     :level :success}]]}}))
+(rf/reg-event-fx
+  :proxies->delete
+  (fn [_ [_ proxy-id]]
+    {:fetch {:uri (str "/proxies/" proxy-id)
+             :method "DELETE"
+             :success-fxs [[:proxies->get]
+                           [:notifications->success {:title "Proxy deleted!"
+                                                     :level :success}]
+                           [:navigate :home]]}}))
 
 (rf/reg-event-fx
   :proxies->create-success

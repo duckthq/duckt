@@ -13,11 +13,11 @@
 
 (defn- basic-info-table [request]
   [:> Table {:variant :vertical}
+   [:> Table.Tbody
     [:> Table.Tr
      [:> Table.Th "URI"]
      [:> Table.Td
        [:> Code(-> request :uri)]]]
-   [:> Table.Tbody
     [:> Table.Tr
      [:> Table.Th "Method"]
      [:> Table.Td

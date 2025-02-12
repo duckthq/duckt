@@ -3,8 +3,23 @@
     [reagent.core :as r]
     ["@mantine/core" :refer [Button]]))
 
+(defn- base [props text]
+  [:> Button (merge
+               props
+               {:type (or type "button")
+                :size (or (:size props) :md)})
+   text])
+
+(defn Primary
+  ([props el]
+   [base (merge props {:variant :filled
+                       :color :dark})
+    el])
+  ([el] [Primary {} el]))
+
+;; TODO: deprecate this, Primary is a better implementation
 (defn primary [{:keys [text loading on-click full?
-                       type]}]
+                       type size]}]
   [:> Button (merge
                {:variant "filled"
                 :onClick on-click

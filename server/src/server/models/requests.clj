@@ -153,15 +153,13 @@
                              [:in :method http-methods])
                            (when status-codes
                              [:in :status_code status-codes])
-                           [:= :proxy_id :proxy-id]
-                           [:= :workspace_id :workspace-id]]
+                           [:= :proxy_id proxy-id]
+                           [:= :workspace_id workspace-id]]
                    :order-by [[(or order-by :created_at)
                                (or order :desc)]]
                    :limit limit
                    :offset offset}
-            params {:honey {:params {:proxy-id proxy-id
-                                     :workspace-id workspace-id}}}
-            requests (pg-honey/execute conn query params)]
+            requests (pg-honey/execute conn query)]
         {:list requests}))))
 
 (defn get-request-by-id [{:keys [request-id workspace-id]}]

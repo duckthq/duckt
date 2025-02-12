@@ -12,6 +12,7 @@
 (rf/reg-event-fx
   :user->set-userinfo
   (fn [{:keys [db]} [_ user-info]]
+    (js/localStorage.setItem "userEmail" (:email (:data user-info)))
     {:db (assoc db :user->userinfo (:data user-info))}))
 
 (rf/reg-sub

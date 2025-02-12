@@ -52,27 +52,43 @@
                [:= :workspace_id workspace-id]]
        :returning [:target_url :description]})))
 
-(defn update-proxy-by-id [workspace-id proxy-id [{:keys [name description
-                                                   target-url]}]]
+(defn update-proxy-by-id
+  [workspace-id proxy-id {:keys [name description
+                                  target-url host-url]}]
   (t/log! :debug (str "Updating proxy model for " proxy-id))
   (with-open [conn (db/connection)]
     (pg-honey/update
       conn :proxies
       {:name name
        :description description
-       :target_url target-url}
+       :target_url target-url
+       :host_url host-url}
       {:where [:and
                [:= :id proxy-id]
                [:= :workspace_id workspace-id]]
-       :returning [:*]})))
+       :returning [:id]})))
+
+(defn generate-new-proxy-key [proxy-id workspace-id new-key]
+  (t/log! :debug (str "Generating new key for proxy " proxy-id))
+  (with-open [conn (db/connection)]
+    (pg-honey/update
+      conn :proxies
+      {:proxy_key_hash new-key}
+      {:where [:and
+               [:= :id proxy-id]
+               [:= :workspace_id workspace-id]]
+       :returning [:id]})))
 
 (defn delete-proxy [proxy-id workspace-id]
   (t/log! :debug (str "Deleting proxy model for " proxy-id))
+  (println :model proxy-id workspace-id)
   (with-open [conn (db/connection)]
     (pg-honey/delete
       conn :proxies
-      {:id proxy-id
-       :workspace_id workspace-id})))
+      {:where [:and
+               [:= :id proxy-id]
+               [:= :workspace_id workspace-id]]
+       :returning [:id]})))
 
 ;; Used for proxy authentication
 (defn get-proxy-by-id [proxy-id]

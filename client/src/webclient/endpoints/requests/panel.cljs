@@ -24,7 +24,6 @@
     (rf/dispatch [:endpoints->get-endpoint endpoint-id])
     (rf/dispatch [:hosts->get-host-by-endpoint-id endpoint-id])
     (fn []
-      (println :endpoint @endpoint)
       [:div
        [:header {:class "mb-4"}
         [h/h1 {:text (str (-> @endpoint :data :method)

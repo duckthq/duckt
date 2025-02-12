@@ -3,10 +3,11 @@
     ["@mantine/core" :refer [TextInput Textarea]]))
 
 (defn input-field
-  [{:keys [placeholder type on-change required error
+  [{:keys [placeholder type on-change onChange required error
            label description input-name id defaultValue]}]
   [:> TextInput (merge
                   (when on-change {:onChange on-change})
+                  (when onChange {:onChange onChange})
                   (when required {:required true
                                   :withAsterisk true})
                   (when error {:error error})
@@ -25,9 +26,10 @@
 (defn textarea-field
   [{:keys [placeholder on-change required error
            label description input-name id
-           defaultValue]}]
+           defaultValue onChange]}]
   [:> Textarea (merge
                   (when on-change {:onChange on-change})
+                  (when onChange {:onChange onChange})
                   (when required {:required true
                                   :withAsterisk true})
                   (when error {:error error})
