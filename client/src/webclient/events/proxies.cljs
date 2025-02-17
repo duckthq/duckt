@@ -66,6 +66,33 @@
     (assoc db :proxies->proxy-info {:loading? false
                                     :data (:data proxy-info)})))
 
+(rf/reg-event-fx
+  :proxies->swap-key
+  (fn [_ [_ proxy-id]]
+    {:fetch {:uri (str "/proxies/" proxy-id "/generate-key" )
+             :method "POST"
+             :success-fxs [[:proxies->get]
+                           [:proxies->set-swapped-key]
+                           [:modal->close]
+                           [:notifications->success
+                            {:title "Key swapped!"
+                             :level :success}]]}}))
+
+(rf/reg-event-fx
+  :proxies->clean-swapped-key-from-memory
+  (fn [{:keys [db]} _]
+    {:db (assoc db :proxies->swapped-key nil)}))
+
+(rf/reg-event-db
+  :proxies->set-swapped-key
+  (fn [db [_ new-key]]
+    (assoc db :proxies->swapped-key (-> new-key :data :proxy-key))))
+
+(rf/reg-sub
+  :proxies->swapped-key
+  (fn [db _]
+    (:proxies->swapped-key db)))
+
 (rf/reg-sub
   :proxies->proxy-info
   (fn [db _]

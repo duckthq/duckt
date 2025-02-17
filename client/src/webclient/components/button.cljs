@@ -17,6 +17,13 @@
     el])
   ([el] [Primary {} el]))
 
+(defn Secondary
+  ([props el]
+   [base (merge props {:variant :light
+                       :color :dark})
+    el])
+  ([el] [Secondary {} el]))
+
 ;; TODO: deprecate this, Primary is a better implementation
 (defn primary [{:keys [text loading on-click full?
                        type size]}]

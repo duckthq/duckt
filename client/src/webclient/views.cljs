@@ -20,7 +20,9 @@
     [webclient.proxies.settings.panel :as proxy-settings-panel]
     [webclient.proxies.request-details.panel :as request-details]
     [webclient.home.panel :as home-panel]
-    [webclient.endpoints.requests.panel :as endpoint-requests-panel]))
+    [webclient.endpoints.requests.panel :as endpoint-requests-panel]
+    ;; components
+    [webclient.components.modal :as modal]))
 
 (defmethod routes/panels :home-panel []
   (set! (.-title js/document) "Home")
@@ -110,6 +112,7 @@
                            :forceColorScheme :light
                            :theme (createTheme mantine-theme)}
        [:> Notifications]
+       [modal/main]
        [:> Container {:fluid true
                       :p "0"
                       :h "100%"}

@@ -174,11 +174,3 @@
                             :method, :response_time, :created_at]}
           request (pg-honey/find-first conn :requests query options)]
       request)))
-
-;(defn count-requests-by-endpoint-id [{:keys [endpoint-id]}]
-;  (t/log! :debug "Counting requests by endpoint id")
-;  (with-open [conn (db/connection)]
-;    (pg/execute
-;      conn
-;      "select count(id) from requests where endpoint_id = $1"
-;      {:params [endpoint-id]})))

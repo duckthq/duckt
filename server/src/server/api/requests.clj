@@ -7,13 +7,6 @@
     [server.models.requests :as requests]))
 (import [java.time Instant])
 
-(defn get-requests [req]
-  (t/log! :debug "Getting requests")
-  (let [context (:context req)
-        requests (requests/get-requests {:limit 20 :offsite 0})]
-    (response {:status "ok"
-               :data requests})))
-
 (defn get-timeframe-requests-by-proxy [req params & _]
   (t/log! :debug "Getting requests by timeframe")
   (let [context (:context req)

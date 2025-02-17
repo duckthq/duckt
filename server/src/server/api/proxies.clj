@@ -52,7 +52,7 @@
       selected-workspace
       hashed-key)
     (response {:status "ok"
-               :data {:proxy-key new-key}})))
+               :data {:proxy-key (str "v1:" proxy-id ":" new-key)}})))
 
 (defn update-proxy-by-id [req params & _]
   (t/log! :debug "Updating proxy")

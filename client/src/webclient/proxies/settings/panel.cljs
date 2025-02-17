@@ -23,29 +23,52 @@
                 :size :md}
      "Delete"]]])
 
-(defn- proxy-keys []
+(defn- swap-key-confirmation [proxy-id]
   [:> Stack
-   [title/h3 "Authentication"]
-   [:> Group
-    [:> Paper {:p :md
-               :withBorder true}
+   [:> Stack {:gap :xs}
+    [title/h5 "Are you sure you want to swap the key?"]
+    [text/Dimmed {:size :md}
+     "This action cannot be undone. This will invalidate the current key and generate a new one."]]
+   [:> Group {:justify :end}
+    [button/Secondary {:onClick #(rf/dispatch [:modal->close])}
+     "Cancel"]
+    [:> Button {:color :red
+                :variant :outline
+                :onClick #(rf/dispatch [:proxies->swap-key proxy-id])
+                :size :md}
+     "Swap"]]])
+
+(defn- proxy-keys [proxy-info]
+  (declare swapped-key)
+  (r/with-let [swapped-key (rf/subscribe [:proxies->swapped-key])]
+    [:> Stack
+     [title/h3 "Authentication"]
      [:> Group
-      [text/Base {:fw 600} "Proxy key"]
-      [text/Dimmed {:size :md}
-       (take 80 (repeat "•"))]
-      [:> Group
-       [button/Primary
-        {:size :sm}
-        "Swap key"]
-       [:> Tooltip {:label (str "This key is never stored in plain text anywhere. "
-                                "Swaping it will invalidate the current key and generate a new one. ")
-                    :arrowOffset 10
-                    :offset 10
-                    :withArrow true
-                    :color :dark
-                    :multiline true
-                    :w 200}
-        [:> IconInfoCircle {:size 20 :stroke 1.5}]]]]]]])
+      [:> Paper {:p :md
+                 :withBorder true}
+       [:> Group
+        [text/Base {:fw 600} "Proxy key"]
+        [text/Dimmed {:size :md}
+         (if @swapped-key
+           @swapped-key
+           (take 80 (repeat "•")))]
+        [:> Group
+         [button/Primary
+          {:size :sm
+           :onClick #(rf/dispatch [:modal->open {:content [swap-key-confirmation
+                                                           (:id proxy-info)]
+                                                 :title "Swap Key"}])}
+          "Swap key"]
+         [:> Tooltip {:label (str "This key is never stored in plain text anywhere. "
+                                  "Swaping it will invalidate the current key and generate a new one. ")
+                      :arrowOffset 10
+                      :offset 10
+                      :withArrow true
+                      :color :dark
+                      :multiline true
+                      :w 200}
+          [:> IconInfoCircle {:size 20 :stroke 1.5}]]]]]]]
+    (finally (rf/dispatch [:proxies->clean-swapped-key-from-memory]))))
 
 (defn- basic-info [info]
   (let [proxy-info-name (r/atom (:name info))

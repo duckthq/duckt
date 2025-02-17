@@ -86,7 +86,7 @@
   ([handler params query-params]
    (fn [req]
      ;(t/log! :debug (str "Params: " (:params req)))
-     (t/log! :info "Proxy handler")
+     (t/log! :debug "Proxy handler")
      (-> req
          authenticate-proxy
          (handler params query-params)))))
@@ -144,9 +144,6 @@
           (routes-handler
             proxies/delete-proxy-by-id
             {:proxy-id proxy-id}))
-
-  (GET "/requests" [] (routes-handler
-                          requests/get-requests))
 
   (GET "/requests/:request-id" [request-id]
        (routes-handler

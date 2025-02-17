@@ -12,6 +12,7 @@
     [webclient.events.requests]
     [webclient.events.endpoints]
     [webclient.events.notifications]
+    [webclient.events.modal]
     ;; end events registration
     ;; internal
     [webclient.config :as config]
