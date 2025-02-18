@@ -14,13 +14,7 @@
         js-confetti (new JSConfetti)]
     (println :new-proxy-info @new-proxy-info)
     (fn []
-      (let [proxy-key (str
-                        (or (:version @new-proxy-info)
-                            "v1")
-                        ":"
-                        (:id @new-proxy-info)
-                        ":"
-                        (:proxy-key @new-proxy-info))]
+      (let [proxy-key (:proxy-key @new-proxy-info)]
       (.addConfetti js-confetti
                     (clj->js {:confettiRadius 2
                               :confettiColors ["#999" "#ddd" "#aaa"]

@@ -2,6 +2,7 @@
   (:require
     [ring.util.response :refer [response]]
     [buddy.hashers :as buddy]
+    [crypto.random :as random]
     [server.models.proxies :as proxies]
     [taoensso.telemere :as t]))
 
@@ -26,7 +27,7 @@
   (let [context (:context req)
         body (:body req)
         selected-workspace (-> context :user-preferences :selected_workspace)
-        new-key (apply str (repeatedly 20 #(rand-nth "abcdefghijklmnopqrstuvwxyz0123456789")))
+        new-key (random/base64 32)
         hashed-key (buddy/derive new-key)
         new-proxy (proxies/create-proxy
                     selected-workspace
@@ -37,12 +38,12 @@
                      :target-url (:target-url body)})]
     (response {:status "ok"
                :data (merge
-                       {:proxy-key new-key}
+                       {:proxy-key (str "v1:" new-key)}
                        (first new-proxy))})))
 
 (defn generate-proxy-key [req params & _]
   (t/log! :debug "Generating proxy key")
-  (let [new-key (apply str (repeatedly 20 #(rand-nth "abcdefghijklmnopqrstuvwxyz0123456789")))
+  (let [new-key (random/base64 32)
         hashed-key (buddy/derive new-key)
         proxy-id (:proxy-id params)
         context (:context req)
@@ -71,7 +72,6 @@
 
 (defn delete-proxy-by-id [req params & _]
   (t/log! :debug "Deleting proxy")
-  (println :delete :proxy)
   (let [context (:context req)
         proxy-id (:proxy-id params)
         selected-workspace (-> context :user-preferences :selected_workspace)]

@@ -9,6 +9,7 @@
                  [buddy/buddy-core "1.11.423"]
                  [buddy/buddy-hashers "2.0.167"]
                  [buddy/buddy-sign "3.5.351"]
+                 [crypto-random "1.2.1"]
                  [cider/cider-nrepl "0.42.1"]
                  ;; db
                  [org.postgresql/postgresql "42.7.5"]

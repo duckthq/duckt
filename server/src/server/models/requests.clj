@@ -36,7 +36,6 @@
                                            {:path uri
                                             :proxy_id proxy-id
                                             :method method} {:fields [:id]})
-            ;customer {}
             customer (when duckt-user-sub
                        (pg-honey/insert-one
                          conn :customers
@@ -46,15 +45,17 @@
                          {:on-conflict [:sub :workspace_id]
                           :do-update-set [:last_seen_at]
                           :returning [:id :sub]}))
-            _ (println :customer customer)
             save-endpoint (fn []
                             (let [local-date (java.time.LocalDate/now)]
-                              ;; The system is limited to running as a single instance
-                              ;; so we can safely assume that this count up is safe
-                              (if (> (count endpoint?) 0)
+                              (if endpoint?
                                 ;; TODO: use on-conflict here
                                 (first (pg-honey/update conn
                                                         :endpoints
+                                                        ;; The system is limited to running as
+                                                        ;; as a single instance so we can safely
+                                                        ;; assume that this count up is safe but
+                                                        ;; eventually some sort of queueing will
+                                                        ;; be implemented
                                                         {:hit_count [:+ :hit_count 1]
                                                          :last_used_at local-date}
                                                         {:where [:= :id (:id endpoint?)]}))
