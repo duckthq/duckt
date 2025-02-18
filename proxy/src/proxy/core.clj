@@ -9,7 +9,24 @@
             [clojure.string :as string])
   (:import [java.time Instant ZoneOffset]))
 
-(def state (atom {}))
+(def ^{:doc
+       "State of the proxy.
+       fields:
+       -> :proxy-id - the id of the proxy
+       -> :target-url - the url of the target server
+       -> :proxy-secret - the secret
+       -> :response-headers-keys - the keys of the response headers to store
+       -> :request-headers-keys - the keys of the request headers to store"}
+  state (atom {}))
+
+;; get the keys of the headers from the store and return only the headers in those keys
+(defn get-headers [headers state-keys]
+  (t/log! :debug (str "get-headers: " state-keys))
+  (reduce (fn [acc k]
+            (let [header-value (get headers k)]
+              (when header-value
+                (assoc acc k header-value))))
+          {} state-keys))
 
 (defn save-request! [request response {:keys [start-time]}]
   (t/log! :debug "save-request!")
@@ -18,8 +35,8 @@
                       :host (:url request)
                       :query-params (:query-string request)
                       :status-code (:status response)
-                      :request-headers (:headers request)
-                      :response-headers (:headers response)
+                      :request-headers (get-headers (:headers request) (:request-headers-keys @state))
+                      :response-headers (get-headers (:headers response) (:response-headers-keys @state))
                       :method (:request-method request)
                       :created-at start-time
                       :response-time (-> (Instant/now)
@@ -62,24 +79,22 @@
                                                    :executor :none
                                                    :raw-stream? true}))
 
-(defn build-state [{:keys [proxy-id proxy-secret target-url]}]
-  (reset! state
-          {:proxy-id proxy-id
-           :target-url target-url
-           :proxy-secret proxy-secret}))
+(defn build-state [new-state]
+  (reset! state new-state))
 
 (defn -main []
   (t/set-min-level! (keyword appconfig/log-level))
   (t/log! :info "Starting proxy server")
-  (t/log! :info (str "Proxy server started at port " appconfig/proxy-port))
   (let [token (or appconfig/proxy-token
                   (throw (ex-info "Proxy token not set" {})))
-        splitted-token (string/split token #":")]
+        splitted-token (string/split token #":")
+        server-config (duckt-server/set-alive!
+                        (nth splitted-token 1)
+                        (nth splitted-token 2))]
     (build-state {:proxy-id (nth splitted-token 1)
-                  :target-url (let [response (duckt-server/set-alive!
-                                               (nth splitted-token 1)
-                                               (nth splitted-token 2))]
-                                (-> response :data :target_url))
+                  :target-url (-> server-config :data :target_url)
+                  :request-headers-keys (-> server-config :data :request_headers_keys)
+                  :response-headers-keys (-> server-config :data :response_headers_keys)
                   :proxy-secret (nth splitted-token 2)})
-    (t/log! :info "I AM ALIVE!")
+    (t/log! :info (str "Proxy server started at port " appconfig/proxy-port))
     (start-proxy! (Integer. appconfig/proxy-port) (:target-url @state))))

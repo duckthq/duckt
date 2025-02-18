@@ -82,10 +82,13 @@
   (t/log! :debug "Setting proxy alive")
   (let [context (:proxy-context req)
         proxy-id (:id context)
-        selected-workspace (:workspace-id context)]
-    (t/log! :debug (str "Setting proxy alive for " proxy-id))
-    (response {:status "ok"
-               :data (first (proxies/update-proxy-status
+        selected-workspace (:workspace-id context)
+        proxy-config (first (proxies/update-proxy-status
                               selected-workspace
                               proxy-id
-                              "ready"))})))
+                              "ready"))]
+    (t/log! :debug (str "Setting proxy alive for " proxy-id))
+    (response {:status "ok"
+               :data (merge proxy-config
+                            {:request_headers_keys [:duckt-user-sub]
+                             :response_headers_keys [:content-type]})})))

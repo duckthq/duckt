@@ -5,7 +5,7 @@
             [cheshire.core :as json :refer [generate-string]]
             [proxy.appconfig :as appconfig]))
 
-;; Add encoder for java.time.OffsetDateTime on the responses
+;; Add encoder for java.time on the responses
 (add-encoder java.time.OffsetDateTime cheshire.generate/encode-str)
 (add-encoder java.time.Instant cheshire.generate/encode-str)
 (add-encoder java.time.ZonedDateTime cheshire.generate/encode-str)
