@@ -39,8 +39,6 @@
       {:fields [:id :name :description
                 :target_url :host_url :status]})))
 
-
-
 (defn update-proxy-status [workspace-id proxy-id status]
   (t/log! :debug (str "Updating proxy status for " proxy-id))
   (with-open [conn (db/connection)]
@@ -54,7 +52,7 @@
 
 (defn update-proxy-by-id
   [workspace-id proxy-id {:keys [name description
-                                  target-url host-url]}]
+                                 target-url host-url]}]
   (t/log! :debug (str "Updating proxy model for " proxy-id))
   (with-open [conn (db/connection)]
     (pg-honey/update

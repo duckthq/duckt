@@ -62,7 +62,9 @@ CREATE TABLE IF NOT EXISTS proxies (
 create table if not exists customers (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   sub TEXT NOT NULL,
-  email TEXT,
+  metadata JSONB,
+  hit_count INTEGER DEFAULT 1,
+  last_seen_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   -- TODO: make this NOT NULL
   workspace_id UUID,
   joined_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -82,7 +84,6 @@ CREATE TABLE IF NOT EXISTS endpoints (
   UNIQUE(proxy_id, path, method)
 );
 
--- TODO: consider partitions
 -- TODO: relate request to events somehow as events is more analytics friendly
 -- maybe add some rules that when a request meets certain criteria, it will be
 -- logged as an event as well
@@ -105,10 +106,12 @@ create table IF NOT EXISTS requests (
   elapsed_time BIGINT,
   workspace_id UUID NOT NULL,
   customer_id UUID,
+  customer_sub TEXT,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
- CREATE INDEX requests_created_at_brin
-   ON requests USING BRIN (created_at) WITH (pages_per_range = 512);
+
+CREATE INDEX requests_created_at_brin
+  ON requests USING BRIN (created_at) WITH (pages_per_range = 512);
 
 CREATE TABLE IF NOT EXISTS customer_stats (
   customer_id UUID NOT NULL REFERENCES customers(id),

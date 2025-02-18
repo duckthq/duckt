@@ -56,7 +56,7 @@
                    (when (= status 401) (let [_ (rf/dispatch [:auth->logout])]))
                    (when (> status 399) (on-failure)))
           req-headers (clj->js (merge {:Accept "application/json"
-                                       :duckt-user-id (js/localStorage.getItem "userEmail")
+                                       :duckt-user-sub (js/localStorage.getItem "userEmail")
                                        :Content-Type "application/json"}
                                       headers))]
       ;; fetch the API

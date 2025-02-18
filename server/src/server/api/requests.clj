@@ -84,7 +84,9 @@
         context (:proxy-context req)
         java-date-created-at (Instant/parse (:created-at body))
         java-date-response-time (Instant/parse (:response-time body))
-        _ (t/log! :debug (str "proxy context " context))]
+        request-headers (json/generate-string (:request-headers body))
+        duckt-user-sub (-> body :request-headers :duckt-user-sub)
+        response-headers (json/generate-string (:response-headers body))]
     (t/log! :debug "Registering request")
     (requests/register-request (:workspace-id context)
                                (:id context)
@@ -94,8 +96,9 @@
                                 :query-params (json/encode (query-params-to-map (:query-params body)))
                                 :status-code (:status-code body)
                                 :method (:method body)
-                                :request-headers (json/generate-string (:request-headers body))
-                                :response-headers (json/generate-string (:response-headers body))
+                                :request-headers request-headers
+                                :duckt-user-sub duckt-user-sub
+                                :response-headers response-headers
                                 :response-time java-date-response-time
                                 :elapsed-time (.toMillis
                                                 (java.time.Duration/between

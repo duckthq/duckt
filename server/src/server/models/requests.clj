@@ -12,74 +12,64 @@
                         proxy-id
                         {:keys [type url uri query-params status-code
                                 method request-headers response-headers
-                                response-time created-at elapsed-time]}]
+                                response-time created-at elapsed-time
+                                duckt-user-sub]}]
   ; TODO: maybe create the request ID in the beginning
   ; so we can improve tracing in the logs?
   (t/log! :debug "Registering request")
-  (let [authorization-token (first (get request-headers "Authorization"))
-        ;; TODO move this logic to a middleware and refactor this
-        claims (when authorization-token
-                 (-> authorization-token
-                     (string/split #"\.")
-                     (second)
-                     (base64/decode)
-                     (String.)
-                     (json/parse-string true)))]
-    (with-open [conn (db/connection)]
-      (pg/with-tx [conn]
-        (let [request {:type type
-                       :url url
-                       :uri uri
-                       :query_params query-params
-                       :proxy-id proxy-id
-                       :status_code status-code
-                       :request_headers request-headers
-                       :response_headers response-headers
-                       :response_time response-time
-                       :elapsed_time elapsed-time
-                       :created_at created-at
-                       :method method
-                       :workspace_id workspace-id}
-              ;identifiable-request? (not (nil? (:sub claims)))
-              ;customer? (when identifiable-request?
-              ;            (pg-honey/find-first conn :host_users {:sub (:sub claims)}))
-              endpoint? (pg-honey/find-first conn :endpoints {:path uri
-                                                              :proxy_id proxy-id
-                                                              :method method} {:fields [:id]})
-              save-endpoint (fn []
-                              (let [local-date (java.time.LocalDate/now)]
-                                ;; The system is limited to running as a single instance
-                                ;; so we can safely assume that this count up is safe
-                                (if (> (count endpoint?) 0)
-                                  (first (pg-honey/update conn
-                                                          :endpoints
-                                                          {:hit_count [:+ :hit_count 1]
-                                                           :last_used_at local-date}
-                                                          {:where [:= :id (:id endpoint?)]}))
-                                  (pg-honey/insert-one conn :endpoints
-                                                       {:path uri
-                                                        :proxy_id proxy-id
-                                                        :method method
-                                                        :workspace_id workspace-id}))))
-              ;; TODO refactor this to an actual upsert
-              upsert-customer (fn [claimed-user customer]
-                                (if (> (count customer) 0)
-                                  (first (pg-honey/update conn
-                                                          :customers
-                                                          {:email (:email claimed-user)}
-                                                          {:where [:= :id (:id customer)]}))
-                                  (pg-honey/insert-one conn :customers
-                                                       {:sub (:sub claimed-user)
-                                                        :email (:email claimed-user)
-                                                        :workspace_id workspace-id})))
-              endpoint (save-endpoint)
-              ;customer (when identifiable-request?
-              ;           (upsert-customer claims customer?))
-              ]
-          (pg-honey/insert-one conn :requests
-                               (merge request
-                                      {:customer_id nil}
-                                      {:endpoint_id (:id endpoint)})))))))
+  (with-open [conn (db/connection)]
+    (pg/with-tx [conn]
+      (let [request {:type type
+                     :url url
+                     :uri uri
+                     :query_params query-params
+                     :proxy-id proxy-id
+                     :status_code status-code
+                     :request_headers request-headers
+                     :response_headers response-headers
+                     :response_time response-time
+                     :elapsed_time elapsed-time
+                     :created_at created-at
+                     :method method
+                     :workspace_id workspace-id}
+            endpoint? (pg-honey/find-first conn :endpoints
+                                           {:path uri
+                                            :proxy_id proxy-id
+                                            :method method} {:fields [:id]})
+            ;customer {}
+            customer (when duckt-user-sub
+                       (pg-honey/insert-one
+                         conn :customers
+                         {:sub duckt-user-sub
+                          :last_seen_at created-at
+                          :workspace_id workspace-id}
+                         {:on-conflict [:sub :workspace_id]
+                          :do-update-set [:last_seen_at]
+                          :returning [:id :sub]}))
+            _ (println :customer customer)
+            save-endpoint (fn []
+                            (let [local-date (java.time.LocalDate/now)]
+                              ;; The system is limited to running as a single instance
+                              ;; so we can safely assume that this count up is safe
+                              (if (> (count endpoint?) 0)
+                                ;; TODO: use on-conflict here
+                                (first (pg-honey/update conn
+                                                        :endpoints
+                                                        {:hit_count [:+ :hit_count 1]
+                                                         :last_used_at local-date}
+                                                        {:where [:= :id (:id endpoint?)]}))
+                                (pg-honey/insert-one conn :endpoints
+                                                     {:path uri
+                                                      :proxy_id proxy-id
+                                                      :method method
+                                                      :workspace_id workspace-id}))))
+            endpoint (save-endpoint)]
+
+        (pg-honey/insert-one conn :requests
+                             (merge request
+                                    {:customer_id (:id customer)
+                                     :customer_sub (:sub customer)}
+                                    {:endpoint_id (:id endpoint)}))))))
 
 ;; Get requests by workspace_id, type, with limit and offsite
 (defn get-requests [{:keys [workspace-id type limit offset]}]
@@ -146,6 +136,7 @@
     (pg/with-tx [conn]
       (let [query {:select [:id :type :url :uri :elapsed_time
                             :status_code :endpoint_id :customer_id
+                            :customer_sub :workspace_id
                             :method :response_time :created_at]
                    :from :requests
                    :where [:and
@@ -170,7 +161,7 @@
           options {:fields [:id, :type, :url, :uri, :elapsed_time,
                             :request_headers, :response_headers,
                             :status_code, :endpoint_id, :customer_id
-                            :query_params
+                            :query_params :customer_sub
                             :method, :response_time, :created_at]}
           request (pg-honey/find-first conn :requests query options)]
       request)))
