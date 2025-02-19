@@ -6,7 +6,7 @@
 (defn- base [props text]
   [:> Button (merge
                props
-               {:type (or type "button")
+               {:type (or (:type props) "button")
                 :size (or (:size props) :md)})
    text])
 

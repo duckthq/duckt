@@ -50,7 +50,9 @@ CREATE TABLE IF NOT EXISTS proxies (
   workspace_id UUID NOT NULL REFERENCES workspaces(id),
   proxy_key_hash TEXT NOT NULL,
   name VARCHAR(255) NOT NULL,
-  status VARCHAR(50) NOT NULL, -- e.g., 'online', 'offline'
+  status VARCHAR(50) NOT NULL,
+  response_headers_config JSONB,
+  request_headers_config JSONB,
   description TEXT,
   target_url TEXT NOT NULL,
   host_url TEXT,

@@ -1,9 +1,6 @@
 (ns server.models.requests
   (:require
-    [clojure.string :as string]
     [taoensso.telemere :as t]
-    [buddy.core.codecs.base64 :as base64]
-    [cheshire.core :as json]
     [server.database :as db]
     [pg.honey :as pg-honey]
     [pg.core :as pg]))
@@ -32,38 +29,26 @@
                      :created_at created-at
                      :method method
                      :workspace_id workspace-id}
-            endpoint? (pg-honey/find-first conn :endpoints
-                                           {:path uri
-                                            :proxy_id proxy-id
-                                            :method method} {:fields [:id]})
             customer (when duckt-user-sub
                        (pg-honey/insert-one
                          conn :customers
                          {:sub duckt-user-sub
-                          :last_seen_at created-at
                           :workspace_id workspace-id}
                          {:on-conflict [:sub :workspace_id]
-                          :do-update-set [:last_seen_at]
+                          :do-update-set {:last_seen_at created-at
+                                          :hit_count [:+ :customers.hit_count 1]}
                           :returning [:id :sub]}))
             save-endpoint (fn []
                             (let [local-date (java.time.LocalDate/now)]
-                              (if endpoint?
-                                ;; TODO: use on-conflict here
-                                (first (pg-honey/update conn
-                                                        :endpoints
-                                                        ;; The system is limited to running as
-                                                        ;; as a single instance so we can safely
-                                                        ;; assume that this count up is safe but
-                                                        ;; eventually some sort of queueing will
-                                                        ;; be implemented
-                                                        {:hit_count [:+ :hit_count 1]
-                                                         :last_used_at local-date}
-                                                        {:where [:= :id (:id endpoint?)]}))
-                                (pg-honey/insert-one conn :endpoints
-                                                     {:path uri
-                                                      :proxy_id proxy-id
-                                                      :method method
-                                                      :workspace_id workspace-id}))))
+                              (pg-honey/insert-one conn :endpoints
+                                                   {:path uri
+                                                    :proxy_id proxy-id
+                                                    :method method
+                                                    :workspace_id workspace-id}
+                                                   {:on-conflict [:path :proxy_id :method]
+                                                    :do-update-set {:hit_count [:+ :endpoints.hit_count 1]
+                                                                    :last_used_at local-date}
+                                                    :returning [:id]})))
             endpoint (save-endpoint)]
 
         (pg-honey/insert-one conn :requests

@@ -61,14 +61,20 @@
         body (:body req)
         proxy-id (:proxy-id params)
         selected-workspace (-> context :user-preferences :selected_workspace)]
-    (response {:status "ok"
-               :data (proxies/update-proxy-by-id
-                      selected-workspace
-                      proxy-id
-                      {:name (:name body)
-                       :description (:description body)
-                       :target-url (:target-url body)
-                       :host-url (:host-url body)})})))
+    (response
+      {:status "ok"
+       :data (proxies/update-proxy-by-id
+               selected-workspace
+               proxy-id
+               (merge
+                 (when-let [name (:name body)] {:name name})
+                 (when-let [description (:description body)] {:description description})
+                 (when-let [request-headers-keys (:request-headers-keys body)]
+                   {:request-headers-keys request-headers-keys})
+                 (when-let [response-headers-keys (:response-headers-keys body)]
+                   {:response-headers-keys response-headers-keys})
+                 (when-let [target-url (:target-url body)] {:target-url target-url})
+                 (when-let [host-url (:host-url body)] {:host-url host-url})))})))
 
 (defn delete-proxy-by-id [req params & _]
   (t/log! :debug "Deleting proxy")
@@ -89,6 +95,12 @@
                               "ready"))]
     (t/log! :debug (str "Setting proxy alive for " proxy-id))
     (response {:status "ok"
-               :data (merge proxy-config
-                            {:request_headers_keys [:duckt-user-sub]
-                             :response_headers_keys [:content-type]})})))
+               :data {:target_url (:target_url proxy-config)
+                      :description (:description proxy-config)
+                      :request_headers_keys (conj
+                                              (-> proxy-config
+                                                  :request_headers_config :keys)
+                                              :duckt-user-sub)
+                      :response_headers_keys (conj (-> proxy-config
+                                                      :response_headers_config :keys)
+                                                   :content-type)}})))

@@ -48,7 +48,9 @@
       {:where [:and
                [:= :id proxy-id]
                [:= :workspace_id workspace-id]]
-       :returning [:target_url :description]})))
+       :returning [:target_url :description
+                   :response_headers_config
+                   :request_headers_config]})))
 
 (defn update-proxy-by-id
   [workspace-id proxy-id {:keys [name description

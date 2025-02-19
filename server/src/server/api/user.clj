@@ -4,11 +4,10 @@
     [taoensso.telemere :as t]))
 
 (defn user-info [req & _]
-  (t/log! :info "Getting user info")
+  (t/log! :debug "Getting user info")
   (let [context (:context req)
         user (:user context)
-        user-preferences (:user-preferences context)
-        ]
+        user-preferences (:user-preferences context)]
     (response {:data {:id (:id user)
                       :email (:email user)
                       :username (:username user)
