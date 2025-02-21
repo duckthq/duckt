@@ -147,7 +147,7 @@
                         :align :center}
               [:> Box {:w "36px"}
                [:> Image
-                {:src "/images/brand/icon-black-white.svg"
+                {:src "/images/brand/icon-green-white.svg"
                  :fit :contain
                  :w "100%"}]]
               [:> Box {:style {:flexGrow 1}}
