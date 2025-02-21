@@ -1,6 +1,5 @@
 ![hero](github-cover.png)
 
-<h1 align="center"><b>Duckt</b></h1>
 <p align="center">
     🦆 Observe your APIs from another perspective
     <br />
