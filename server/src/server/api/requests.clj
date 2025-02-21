@@ -51,6 +51,18 @@
                                             (string/split
                                               (string/lower-case http-methods)
                                               #",")))
+                          :customer-ids (when-let [customer-ids (get query-params "customer_ids")]
+                                          (when-not (string/blank? customer-ids)
+                                            (map parse-long
+                                                 (string/split customer-ids #","))))
+                          :customer-subs (when-let [customer-subs (get query-params "customer_subs")]
+                                          (when-not (string/blank? customer-subs)
+                                            (map parse-long
+                                                 (string/split customer-subs #","))))
+                          :endpoints-ids (when-let [endpoints-ids (get query-params "endpoints_ids")]
+                                           (when-not (string/blank? endpoints-ids)
+                                             (map parse-long
+                                                  (string/split endpoints-ids #","))))
                           :order-by (get query-params "order_by") ;; field
                           :order (get query-params "order") ;; :asc or :desc
                           :customer-id (get query-params "customer_id")

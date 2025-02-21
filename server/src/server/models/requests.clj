@@ -114,9 +114,9 @@
 
 (defn get-requests-by-proxy-id
   [{:keys [proxy-id workspace-id limit offset
-           order order-by customer-id
+           order order-by customer-ids customer-subs
            start-date end-date
-           status-codes http-methods endpoint-id]}]
+           status-codes http-methods endpoints-ids]}]
   (t/log! :debug "Getting requests by proxy id")
   (with-open [conn (db/connection)]
     (pg/with-tx [conn]
@@ -126,6 +126,16 @@
                             :method :response_time :created_at]
                    :from :requests
                    :where [:and
+                           (when endpoints-ids
+                             [:in :endpoint_id endpoints-ids])
+                           (when customer-ids
+                             [:in :customer_id customer-ids])
+                           (when customer-subs
+                             [:in :customer_sub customer-subs])
+                           (when start-date
+                             [:>= :created_at start-date])
+                           (when end-date
+                             [:<= :created_at end-date])
                            (when http-methods
                              [:in :method http-methods])
                            (when status-codes

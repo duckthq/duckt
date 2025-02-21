@@ -38,7 +38,7 @@
                      :target-url (:target-url body)})]
     (response {:status "ok"
                :data (merge
-                       {:proxy-key (str "v1:" new-key)}
+                       {:proxy-key (str "v1:" (:id (first new-proxy)) new-key)}
                        (first new-proxy))})))
 
 (defn generate-proxy-key [req params & _]
@@ -94,6 +94,7 @@
                               proxy-id
                               "ready"))]
     (t/log! :debug (str "Setting proxy alive for " proxy-id))
+    (println :proxy-config proxy-config)
     (response {:status "ok"
                :data {:target_url (:target_url proxy-config)
                       :description (:description proxy-config)
