@@ -1,7 +1,7 @@
 ![hero](github-cover.png)
 
 <p align="center">
-    🦆 Observe your APIs from another perspective
+    🦆 Observe your APIs from another perspective 🦆
     <br />
     <br />
     <a target="_blank" href="https://duckt.dev">Website</a>
