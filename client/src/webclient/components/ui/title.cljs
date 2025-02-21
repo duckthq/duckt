@@ -1,6 +1,6 @@
 (ns webclient.components.ui.title
   (:require
-    ["@mantine/core" :refer [Title Text Stack]]
+    ["@mantine/core" :refer [Title Stack]]
     [webclient.components.ui.text :as text]))
 
 (defn page-title
