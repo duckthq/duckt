@@ -6,7 +6,8 @@
     ["@mantine/core" :refer [Text Group Stack Divider Box Badge
                              Anchor MultiSelect TagsInput]]
     [webclient.components.h :as h]
-    [webclient.routes :as routes]))
+    [webclient.routes :as routes]
+    [bidi.bidi :as bidi]))
 
 (defn- request-list-item [request proxy-id]
   [:> Anchor {:href (routes/url-for :request-details
@@ -77,14 +78,20 @@
         thirty-days-ago (.toISOString (dayjs (- (js/Date.now) 2592000000)))]
     {:start thirty-days-ago :end today}))
 
-(defn main [proxy-id]
+(defn main []
   (let [requests (rf/subscribe [:requests])
         proxies (rf/subscribe [:proxies])]
-    (rf/dispatch [:requests->get-by-proxy-id proxy-id])
+    ;; for direct link rendering
+    (rf/dispatch [:requests->get-by-proxy-id (routes/get-page-param :proxy-id)])
     (fn []
-      (let [selected-proxy (->> (:data @proxies)
+      (let [proxy-id (routes/get-page-param :proxy-id)
+            selected-proxy (->> (:data @proxies)
                                 (filter #(= (:id %) proxy-id))
                                 first)]
+        ;(println :selected-proxy selected-proxy)
+        (println :proxy-id proxy-id)
+        (when-not (= (:id selected-proxy) proxy-id)
+          (println :hue selected-proxy proxy-id))
         [:> Box {:p :md}
          [:> Stack {:gap :lg}
           [:header

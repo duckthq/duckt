@@ -17,10 +17,10 @@
     [webclient.proxies.new-proxy-success :as new-proxy-success]
     [webclient.proxies.overview.panel :as proxy-overview-panel]
     [webclient.proxies.requests.panel :as proxy-requests-panel]
-    [webclient.proxies.customers.panel :as proxy-customers-panel]
     [webclient.proxies.settings.panel :as proxy-settings-panel]
     [webclient.proxies.request-details.panel :as request-details]
     [webclient.home.panel :as home-panel]
+    [webclient.customers.panel :as customers-panel]
     [webclient.endpoints.requests.panel :as endpoint-requests-panel]
     ;; components
     [webclient.components.modal :as modal]))
@@ -35,6 +35,11 @@
   (set! (.-title js/document) "New Proxy")
   [application/layout [new-proxy-success/panel]])
 
+(defmethod routes/panels :customers-panel []
+  (set! (.-title js/document) "Customers")
+  [application/layout [customers-panel/main]])
+
+
 (defmethod routes/panels :request-details-panel []
   (set! (.-title js/document) "Request Details")
   (let [pathname (.. js/window -location -pathname)
@@ -46,27 +51,11 @@
 
 (defmethod routes/panels :proxy-overview-panel []
   (set! (.-title js/document) "Overview")
-  (let [pathname (.. js/window -location -pathname)
-        current-route (bidi/match-route @routes/routes pathname)
-        proxy-id (-> current-route :route-params :proxy-id)]
-
-  [application/layout [proxy-overview-panel/main proxy-id]]))
+  [application/layout [proxy-overview-panel/main]])
 
 (defmethod routes/panels :proxy-requests-panel []
   (set! (.-title js/document) "Requests")
-  (let [pathname (.. js/window -location -pathname)
-        current-route (bidi/match-route @routes/routes pathname)
-        proxy-id (-> current-route :route-params :proxy-id)]
-
-  [application/layout [proxy-requests-panel/main proxy-id]]))
-
-(defmethod routes/panels :proxy-customers-panel []
-  (set! (.-title js/document) "Customers")
-  (let [pathname (.. js/window -location -pathname)
-        current-route (bidi/match-route @routes/routes pathname)
-        proxy-id (-> current-route :route-params :proxy-id)]
-
-  [application/layout [proxy-customers-panel/main proxy-id]]))
+  [application/layout [proxy-requests-panel/main]])
 
 (defmethod routes/panels :proxy-settings-panel []
   (set! (.-title js/document) "Proxy settings")

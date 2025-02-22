@@ -85,6 +85,8 @@
                                                      :stroke "1.5"}])}
            [:> NavLink {:href (routes/url-for :proxy-overview
                                               {:proxy-id (:id p)})
+                        :onClick #(do (rf/dispatch [:requests->get-by-proxy-id (:id p)])
+                                      (rf/dispatch [:proxies->set-active-proxy (:id p)]))
                         :label "Overview"
                         :variant :light
                         :styles {:root {:border-radius "var(--mantine-radius-md)"}}
@@ -93,20 +95,12 @@
                                                     {:size 16
                                                      :stroke "1.5"}])}]
            [:> NavLink {:href (routes/url-for :proxy-requests {:proxy-id (:id p)})
+                        :onClick #(rf/dispatch [:requests->get-by-proxy-id (:id p)])
                         :label "Requests"
                         :variant :light
                         :styles {:root {:border-radius "var(--mantine-radius-md)"}}
                         :color :gray
                         :leftSection (r/as-element [:> IconListTree
-                                                    {:size 16
-                                                     :stroke "1.5"}])}]
-           [:> NavLink {:href (routes/url-for :proxy-customers
-                                              {:proxy-id (:id p)})
-                        :label "Customers"
-                        :variant :light
-                        :styles {:root {:border-radius "var(--mantine-radius-md)"}}
-                        :color :gray
-                        :leftSection (r/as-element [:> IconUsers
                                                     {:size 16
                                                      :stroke "1.5"}])}]
            [:> Divider]
@@ -163,13 +157,22 @@
                                      :color "var(--mantine-color-gray-8)"
                                      :stroke "3"}]]]]]
             [workspaces-menu-dropdown @workspaces selected-workspace]]
-           [:> Stack {:p :xs}
+           [:> Stack {:p :xs
+                      :gap 0}
             [:> NavLink {:href (routes/url-for :home)
                          :label "Home"
                          :styles {:root {:border-radius "var(--mantine-radius-md)"}}
                          :variant :light
                          ;:active true
                          :leftSection (r/as-element [:> IconHome
+                                                     {:size 16
+                                                      :stroke "1.5"}])}]
+            [:> NavLink {:href (routes/url-for :customers)
+                         :label "Customers"
+                         :variant :light
+                         :styles {:root {:border-radius "var(--mantine-radius-md)"}}
+                         :color :gray
+                         :leftSection (r/as-element [:> IconUsers
                                                      {:size 16
                                                       :stroke "1.5"}])}]
             [sources]]]]]))))

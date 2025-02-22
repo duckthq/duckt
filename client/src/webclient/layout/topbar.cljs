@@ -43,15 +43,15 @@
                                          :onClick #(rf/dispatch [:navigate {:handler :proxy-overview
                                                                             :params {:proxy-id (:id p)}}])
                                          :leftSection (r/as-element
-                                                        [:> IconChartHistogram {:size 24
-                                                                                :stroke 1.5}])}
+                                                        [:> IconChartHistogram {:size 20
+                                                                                :stroke 2}])}
                                          {:id (str (:id p) "-requests")
                                           :label (str (:name p) " Requests")
                                           :description (:description p)
                                           :onClick #(rf/dispatch [:navigate {:handler :proxy-requests
                                                                              :params {:proxy-id (:id p)}}])
                                           :leftSection (r/as-element
-                                                         [:> IconListTree {:size 24
+                                                         [:> IconListTree {:size 20
                                                                             :stroke 1.5}])}
                                          {:id (str (:id p) "-customers")
                                           :label (str (:name p) " Customers")
@@ -59,7 +59,7 @@
                                           :onClick #(rf/dispatch [:navigate {:handler :proxy-customers
                                                                              :params {:proxy-id (:id p)}}])
                                           :leftSection (r/as-element
-                                                        [:> IconUsers {:size 24
+                                                        [:> IconUsers {:size 20
                                                                            :stroke 1.5}])}])
                                       (:data @proxies))))]
         [:> Box {:id "topbar"
@@ -67,7 +67,8 @@
                  :top 0
                  :left 0
                  :class "topbar"}
-         [:> Spotlight {:actions spotlight-actions}]
+         [:> Spotlight {:actions spotlight-actions
+                        :limit 5}]
          [:> Box {:px "sm"
                   :py "md"}
           [:> Group {:justify "space-between"

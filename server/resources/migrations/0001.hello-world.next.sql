@@ -67,8 +67,7 @@ create table if not exists customers (
   metadata JSONB,
   hit_count INTEGER DEFAULT 1,
   last_seen_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-  -- TODO: make this NOT NULL
-  workspace_id UUID,
+  workspace_id UUID NOT NULL REFERENCES workspaces(id),
   joined_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   UNIQUE(sub, workspace_id)
 );

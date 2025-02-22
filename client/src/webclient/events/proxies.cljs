@@ -84,6 +84,11 @@
     {:db (assoc db :proxies->swapped-key nil)}))
 
 (rf/reg-event-db
+  :proxies->set-active-proxy
+  (fn [db [_ proxy-id]]
+    (assoc db :proxies->active-proxy proxy-id)))
+
+(rf/reg-event-db
   :proxies->set-swapped-key
   (fn [db [_ new-key]]
     (assoc db :proxies->swapped-key (-> new-key :data :proxy-key))))
@@ -107,3 +112,8 @@
   :proxies
   (fn [db _]
     (:proxies db)))
+
+(rf/reg-sub
+  :proxies->active-proxy
+  (fn [db _]
+    (:proxies->active-proxy db)))

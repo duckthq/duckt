@@ -13,6 +13,7 @@
   (atom
     ["/"
      {""      :home
+      "customers" :customers
       "endpoints" [[["/" :endpoint-id "/requests"] :endpoint-requests]]
       "login" :login
       "proxies" [[["/new"] :new-proxy]
@@ -59,6 +60,13 @@
 (defn start!
   []
   (pushy/start! history))
+
+(defn get-page-param
+  "Receives a keyword representing the param name and returns the value of the param"
+  [param-name]
+  (let [pathname (.. js/window -location -pathname)
+        current-route (bidi/match-route @routes pathname)]
+  (-> current-route :route-params param-name)))
 
 (re-frame/reg-fx
  :navigate

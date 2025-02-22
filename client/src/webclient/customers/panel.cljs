@@ -1,4 +1,4 @@
-(ns webclient.proxies.customers.panel
+(ns webclient.customers.panel
   (:require
     [re-frame.core :as rf]
     ["@mantine/core" :refer [Stack Group Box Divider Avatar]]

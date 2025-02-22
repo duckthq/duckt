@@ -6,7 +6,8 @@
     ["@mantine/core" :refer [Text Group Stack Box
                              SegmentedControl]]
     ["@mantine/charts" :refer [AreaChart]]
-    [webclient.components.h :as h]))
+    [webclient.components.h :as h]
+    [webclient.routes :as routes]))
 
 (defmulti timeframe-dates identity)
 (defmethod timeframe-dates "24 hours" [_]
@@ -22,8 +23,9 @@
         thirty-days-ago (.toISOString (dayjs (- (js/Date.now) 2592000000)))]
     {:start thirty-days-ago :end today}))
 
-(defn- requests-chart [{:keys [proxy-id]}]
-  (let [timeperiod-text (r/atom "24 hours")
+(defn- requests-chart [proxy-id]
+  (let [cached-proxy-id (r/atom proxy-id)
+        timeperiod-text (r/atom "24 hours")
         status-code-groups (r/atom #{:all :5 :4})
         last-24-hours-tf (timeframe-dates "24 hours")
         requests-timeframe (rf/subscribe [:requests->timeframe])
@@ -32,7 +34,7 @@
                             (reset! timeperiod-text t)
                             (doall (for [s @status-code-groups]
                               (rf/dispatch [:requests->get-timeframe-by-proxy
-                                            {:proxy-id proxy-id
+                                            {:proxy-id (routes/get-page-param :proxy-id)
                                              :status-code-group s
                                              :start-time (:start tf-dates)
                                              :end-time (:end tf-dates)}])))))]
@@ -44,7 +46,18 @@
                      :start-time (:start last-24-hours-tf)
                      :end-time (:end last-24-hours-tf)}])))
 
-    (fn []
+    (fn [local-proxy-id]
+      ;; logic for when the user moves from one proxy overview to another
+      ;; and the page params will stay the same and won't get the info
+      ;; from the right proxy
+      (when-not (= @cached-proxy-id local-proxy-id)
+        (reset! cached-proxy-id local-proxy-id)
+        (doall (for [s @status-code-groups]
+                 (rf/dispatch [:requests->get-timeframe-by-proxy
+                               {:proxy-id local-proxy-id
+                                :status-code-group s
+                                :start-time (:start last-24-hours-tf)
+                                :end-time (:end last-24-hours-tf)}]))))
       (let [data (mapv (fn [all item-5 item-4]
                          {:date (:time_bucket all)
                           :all (:total all)
@@ -92,11 +105,16 @@
                                  {:name "4xx" :color "yellow.5"}]
                         :h 300}]]))))
 
-(defn main [proxy-id]
-  (let [proxies (rf/subscribe [:proxies])]
-    (rf/dispatch [:requests->get-by-proxy-id proxy-id])
+(defn main []
+  (let [proxies (rf/subscribe [:proxies])
+        active-proxy (rf/subscribe [:proxies->active-proxy])]
+    (rf/dispatch [:requests->get-by-proxy-id
+                  (routes/get-page-param :proxy-id)])
+    (rf/dispatch [:proxies->set-active-proxy (routes/get-page-param :proxy-id)])
     (fn []
-      (let [selected-proxy (->> (:data @proxies)
+      ;(println :active-proxy @active-proxy)
+      (let [proxy-id (routes/get-page-param :proxy-id)
+            selected-proxy (->> (:data @proxies)
                                 (filter #(= (:id %) proxy-id))
                                 first)]
         [:> Box {:p :md}
@@ -104,4 +122,4 @@
           [:header
            [h/page-title (:name selected-proxy)]]
           [:> Stack {:gap :md}
-           [requests-chart {:proxy-id proxy-id}]]]]))))
+           [requests-chart (or @active-proxy proxy-id)]]]]))))
