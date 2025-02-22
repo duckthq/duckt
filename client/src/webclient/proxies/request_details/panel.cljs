@@ -3,12 +3,11 @@
     [re-frame.core :as rf]
     [reagent.core :as r]
     ["@mantine/core" :refer [Stack Group Badge Table Paper Box
-                             Code]]
+                             Code Avatar]]
     ["@tabler/icons-react" :refer [IconArrowBack]]
     [webclient.components.ui.title :as title]
     [webclient.components.ui.anchor :as anchor]
     [webclient.components.ui.text :as text]
-    [webclient.components.button :as button]
     [webclient.routes :as routes]))
 
 (defn- basic-info-table [request]
@@ -74,10 +73,23 @@
            [:> Table.Td
             [text/Base (second h)]]]))]]))
 
+(defn- user-information []
+  (fn []
+    [:> Box {:pos :relative}
+     [:> Group
+      [:> Avatar {:color "initials"
+               :component "a"
+               :href "#"
+               :variant "light"
+               :size :sm
+               :name "User Name"}]
+      [text/Base "User Name"]]]))
+
 (defn main [proxy-id request-id]
   (let [request (rf/subscribe [:requests->request-details])]
     (rf/dispatch [:requests->get-request-details request-id])
     (fn []
+      (println :request-details @request)
       [:<>
        [:> Stack {:p :md}
         [:> Group
@@ -101,10 +113,18 @@
             [:> Stack
              [title/h3 "Overview"]
              [basic-info-table (:data @request)]]
-            (comment [:> Stack {:grow true}
-             [title/h3 "User information"]
-             [:> Box {:pos :relative}
-              "WIP"]])]
+            (when (-> @request :data :customer_sub)
+              [:> Stack {:grow "true"}
+               [title/h3 "User information"]
+               [:> Box {:pos :relative}
+                [:> Group
+                 [:> Avatar {:color "initials"
+                             :component "a"
+                             :href "#"
+                             :variant "light"
+                             :size :sm
+                             :name (-> @request :data :customer_sub)}]
+                 [text/Base (-> @request :data :customer_sub)]]]])]
            [:> Stack
             [title/h3 "Query parameters"]
             [query-params-table (-> @request :data :query_params)]]

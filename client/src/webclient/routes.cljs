@@ -62,8 +62,8 @@
 
 (re-frame/reg-fx
  :navigate
- (fn [handler query-params & params]
-   (navigate! {:handler handler
-               :params params
+ (fn [config]
+   (navigate! {:handler (:handler config)
+               :params (:params config)
                :query-params (query-params-parser
-                               (or query-params {}))})))
+                               (or (:query-params config) {}))})))

@@ -3,7 +3,7 @@
     [re-frame.core :as rf]
     [bidi.bidi :as bidi]
     ["@mantine/core" :refer [MantineProvider createTheme
-                             Container NavLink Anchor]]
+                             Container NavLink]]
     ["@mantine/notifications" :refer [Notifications]]
     [webclient.styles :as styles]
     [webclient.events.core]
@@ -17,6 +17,7 @@
     [webclient.proxies.new-proxy-success :as new-proxy-success]
     [webclient.proxies.overview.panel :as proxy-overview-panel]
     [webclient.proxies.requests.panel :as proxy-requests-panel]
+    [webclient.proxies.customers.panel :as proxy-customers-panel]
     [webclient.proxies.settings.panel :as proxy-settings-panel]
     [webclient.proxies.request-details.panel :as request-details]
     [webclient.home.panel :as home-panel]
@@ -65,7 +66,7 @@
         current-route (bidi/match-route @routes/routes pathname)
         proxy-id (-> current-route :route-params :proxy-id)]
 
-  [application/layout [proxy-requests-panel/main proxy-id]]))
+  [application/layout [proxy-customers-panel/main proxy-id]]))
 
 (defmethod routes/panels :proxy-settings-panel []
   (set! (.-title js/document) "Proxy settings")

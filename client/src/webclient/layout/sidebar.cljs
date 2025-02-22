@@ -100,15 +100,15 @@
                         :leftSection (r/as-element [:> IconListTree
                                                     {:size 16
                                                      :stroke "1.5"}])}]
-           (comment [:> NavLink {:href (routes/url-for :proxy
-                                              {:id (:id p)})
-                        :label "Users"
+           [:> NavLink {:href (routes/url-for :proxy-customers
+                                              {:proxy-id (:id p)})
+                        :label "Customers"
                         :variant :light
                         :styles {:root {:border-radius "var(--mantine-radius-md)"}}
                         :color :gray
                         :leftSection (r/as-element [:> IconUsers
                                                     {:size 16
-                                                     :stroke "1.5"}])}])
+                                                     :stroke "1.5"}])}]
            [:> Divider]
            [:> NavLink {:href (routes/url-for :proxy-settings {:proxy-id (:id p)})
                         :label "Settings"

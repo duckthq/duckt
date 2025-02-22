@@ -10,6 +10,7 @@
     [webclient.events.user]
     [webclient.events.hosts]
     [webclient.events.requests]
+    [webclient.events.customers]
     [webclient.events.endpoints]
     [webclient.events.notifications]
     [webclient.events.modal]
