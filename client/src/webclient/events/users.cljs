@@ -36,6 +36,17 @@
                 {:data nil
                  :status nil})}))
 
+(rf/reg-event-fx
+  :users->update-role
+  (fn [{:keys [db]} [_ user-id role]]
+    {:fetch {:uri (str "/users/" user-id "/role")
+             :method "PUT"
+             :body {:role role}
+             :success-fxs [[:users->get]
+                           [:notifications->success {:title "User role updated!"
+                                                     :level :success}]]}
+     :db db}))
+
 (rf/reg-event-db
   :user->set
   (fn [db [_ users]]

@@ -93,7 +93,7 @@
           (:email user)]]]
        [:> Divider {:orientation :vertical}]
        [forms/select-field {:defaultValue (:role user)
-                            :onChange (fn [value] (js/console.log value))
+                            :onChange #(rf/dispatch [:users->update-role (:id user) %])
                             :disabled (= (count users) 1)
                             :size :xs
                             :data ["member" "admin" "owner"]}]

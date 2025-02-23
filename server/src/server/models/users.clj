@@ -27,10 +27,37 @@
                                     :workspace_id workspace-id})]
         (:id new-user)))))
 
-(defn update-one [user]
+(defn update-by-id [user-id workspace-id data]
   (t/log! :debug "Updating user")
   (with-open [conn (db/connection)]
-    (pg-honey/update conn :users user)))
+    (pg/with-tx [conn]
+      ;; this checks if the user is in the workspace
+      (when-let [user-from-workspace (pg-honey/find-first
+                                       conn :user_workspaces
+                                       {:user_id user-id
+                                        :workspace_id workspace-id})]
+        (let [updated-user (pg-honey/update
+                             conn :users
+                             (merge (when-let [fullname (:fullname data)]
+                                      {:fullname fullname})
+                                    (when-let [username (:username data)]
+                                      {:username username}))
+                             {:where [:= :id (:id user-from-workspace)]
+                              :returning [:id, :email, :fullname]})]
+          updated-user)))))
+
+(defn update-role [user-id workspace-id data]
+  (t/log! :debug "Updating user")
+  (with-open [conn (db/connection)]
+    (pg/with-tx [conn]
+      (let [updated-role (when (:role data)
+                           (pg-honey/update
+                             conn :user_workspaces
+                             {:role (:role data)}
+                             {:where [:and
+                                      [:= :user_id user-id]
+                                      [:= :workspace_id workspace-id]]}))]
+        updated-role))))
 
 (defn list-users [workspace-id]
   (t/log! :debug "Getting users")

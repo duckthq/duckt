@@ -111,6 +111,10 @@
     (PUT "/:user-id" [user-id]
          (routes-handler
            users/update-one
+           {:user-id user-id}))
+    (PUT "/:user-id/role" [user-id]
+         (routes-handler
+           users/update-role
            {:user-id user-id})))
 
   (GET "/workspaces" []

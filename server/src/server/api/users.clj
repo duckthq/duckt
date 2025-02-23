@@ -35,15 +35,40 @@
                       :email (:email body)
                       :password new-password}})))
 
+
+(defn update-role [req params & _]
+  (t/log! :debug "Updating user user")
+  (let [context (:context req)
+        body (:body req)
+        user-id (:user-id params)
+        workspace-id (-> context :user-preferences :selected_workspace)
+        updated-user (users/update-role
+                       user-id
+                       workspace-id
+                       (when-let [role (when
+                                         (contains? #{"admin" "member" "owner"}
+                                                    (:role body))
+                                         (:role body))]
+                         {:role role}))]
+    (response {:status "ok"
+               :data updated-user})))
+
 (defn update-one [req params & _]
   (t/log! :debug "Updating user")
   (let [context (:context req)
         body (:body req)
-        user-id (:user_id params)
+        user-id (:user-id params)
         workspace-id (-> context :user-preferences :selected_workspace)
-        updated-user (users/update-one {:user-id user-id
-                                        :workspace-id workspace-id
-                                        :user {:email (:email body)
-                                               :role (:role body)}})]
+        updated-user (users/update-by-id
+                       user-id
+                       workspace-id
+                       (merge
+                         (when-let [fullname (:fullname body)]
+                           {:fullname fullname})
+                         (when-let [role (when
+                                           (contains? #{"admin" "member" "owner"}
+                                                      (:role body))
+                                           (:role body))]
+                           {:role role})))]
     (response {:status "ok"
                :data updated-user})))
