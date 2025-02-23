@@ -13,11 +13,9 @@
         users (users/list-users user-workspace)
         res (map (fn [user]
                    (let [u (filter #(= (:id %) (:user_id user)) (:users users))]
-                     (println :u u)
                      (merge {:role (:role user)}
                             (first u))))
                  (:workspace-users users))]
-    (println :workspace-users (:workspace-users users))
     (response {:status "ok"
                :data res})))
 
