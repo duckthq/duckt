@@ -7,16 +7,15 @@
    [webclient.events.core :as events]))
 
 (defmulti panels identity)
-(defmethod panels :default [] [:div "No panel found for this route."])
 
 (def routes
   (atom
-    ["/"
-     {""      :home
-      "customers" :customers
-      "endpoints" [[["/" :endpoint-id "/requests"] :endpoint-requests]]
-      "login" :login
-      "proxies" [[["/new"] :new-proxy]
+    [""
+     {"/" :home
+      "/customers" :customers
+      "/endpoints" [[["/" :endpoint-id "/requests"] :endpoint-requests]]
+      "/login" :login
+      "/proxies" [[["/new"] :new-proxy]
                  ["/new/success" :new-proxy-success]
                  [["/" :proxy-id "/overview"] :proxy-overview]
                  [["/" :proxy-id "/requests"] :proxy-requests]
@@ -24,8 +23,8 @@
                  [["/" :proxy-id "/settings"] :proxy-settings]
                  [["/" :proxy-id "/requests/" :request-id] :request-details]
                  ["" :proxies]]
-      "signup" :signup
-      "about" :about}]))
+      "/signup" :signup
+      "/settings/users" :user-settings}]))
 
 (defn query-params-parser
   [queries]

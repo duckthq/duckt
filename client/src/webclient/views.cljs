@@ -8,7 +8,7 @@
     [webclient.styles :as styles]
     [webclient.events.core]
     [webclient.routes :as routes]
-    [webclient.subs :as subs]
+    [webclient.subs]
     [webclient.layout.application :as application]
     ;; pages
     [webclient.auth.login :as login]
@@ -22,6 +22,7 @@
     [webclient.home.panel :as home-panel]
     [webclient.customers.panel :as customers-panel]
     [webclient.endpoints.requests.panel :as endpoint-requests-panel]
+    [webclient.settings.users.panel :as users-settings-panel]
     ;; components
     [webclient.components.modal :as modal]))
 
@@ -72,8 +73,14 @@
 
   [application/layout [endpoint-requests-panel/main endpoint-id]]))
 
+(defmethod routes/panels :user-settings-panel []
+  (set! (.-title js/document) "Users settings")
+  [application/layout [users-settings-panel/main]])
+
 (defmethod routes/panels :login-panel [] [login/panel])
 (defmethod routes/panels :signup-panel [] [signup/panel])
+(defmethod routes/panels :default []
+  [application/layout [:div "404 Not Found"]])
 
 (def mantine-theme
   #js {:defaultRadius "md"
@@ -92,12 +99,13 @@
                                  {"root" {"--nl-hover" "red"}}))})}})
 
 (defn main-panel []
-  (let [active-panel (rf/subscribe [::subs/active-panel])
+  (let [active-panel (rf/subscribe [:active-panel])
         ;serverinfo (rf/subscribe [:serverinfo])
         theme (rf/subscribe [:theme])]
     (styles/build-styles)
     (rf/dispatch [:serverinfo->get])
     (fn []
+      (println :debug :active-panel @active-panel)
       [:> MantineProvider {:defaultColorScheme @theme
                            :forceColorScheme :light
                            :theme (createTheme mantine-theme)}
@@ -106,4 +114,4 @@
        [:> Container {:fluid true
                       :p "0"
                       :h "100%"}
-        [routes/panels @active-panel]]])))
+        (routes/panels @active-panel)]])))

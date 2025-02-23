@@ -3,13 +3,13 @@ SET timezone TO 'UTC';
 
 create table IF NOT EXISTS users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  username VARCHAR(255) UNIQUE NOT NULL,
+  status VARCHAR(50) DEFAULT 'invited',
+  username VARCHAR(255),
   email VARCHAR(255) UNIQUE NOT NULL,
   password_hash VARCHAR(255),
   given_name VARCHAR(255),
   family_name VARCHAR(255),
   fullname VARCHAR(255),
-  preferred_username VARCHAR(255),
   profile TEXT,
   picture TEXT,
   birthdate DATE,

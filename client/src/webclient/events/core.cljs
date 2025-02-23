@@ -8,6 +8,7 @@
     [webclient.events.workspaces]
     [webclient.events.proxies]
     [webclient.events.user]
+    [webclient.events.users]
     [webclient.events.hosts]
     [webclient.events.requests]
     [webclient.events.customers]

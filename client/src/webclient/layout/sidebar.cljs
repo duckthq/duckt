@@ -3,11 +3,11 @@
     [reagent.core :as r]
     [re-frame.core :as rf]
     ["@tabler/icons-react" :refer [IconChevronDown IconCirclePlus IconCheck IconChartHistogram
-                                   IconHome IconAffiliate IconUsers
+                                   IconHome IconAffiliate IconUsers IconUser
                                    IconSettings IconListTree]]
     ["@mantine/core" :refer [Stack Group Box Text Menu Image
                              NavLink Divider Tooltip Anchor
-                             useMantineTheme]]
+                             ScrollArea]]
     [webclient.routes :as routes]))
 
 (defn- workspaces-menu-dropdown []
@@ -35,15 +35,32 @@
                       :onClick #(println :clicked)}
         "Create new workspace"]]))
 
+(defn- workspace-settings []
+  [:> Stack
+   [:> Box {:p :md}
+    [:> Divider {:label "Settings"
+                 :labelPosition :left}]
+    [:> NavLink {:href (routes/url-for :user-settings)
+                 :label "Users"
+                 :styles {:root {:border-radius "var(--mantine-radius-md)"}}
+                 :variant :light
+                 :leftSection (r/as-element [:> IconUser
+                                             {:size 16
+                                              :stroke "1.5"}])}]]])
 
 (defn- sources []
   (let [proxies (rf/subscribe [:proxies])]
     (rf/dispatch [:proxies->get])
 
     (fn []
-      [:> Stack
-       [:> Group {:component  "header"
-                  :style {:borderBottom "1px solid var(--mantine-color-gray-3)"}
+      [:> Stack {:style {:flexGrow 1}}
+       [:> Group {:component "header"
+                  :pos :sticky
+                  :top 0
+                  :left 0
+                  :bg "gray.1"
+                  :style {:borderBottom "1px solid var(--mantine-color-gray-3)"
+                          :z-index 1}
                   :pb "4px"}
         [:> Text {:size :xs
                   :style {:flexGrow 1}
@@ -95,7 +112,8 @@
                                                     {:size 16
                                                      :stroke "1.5"}])}]
            [:> NavLink {:href (routes/url-for :proxy-requests {:proxy-id (:id p)})
-                        :onClick #(rf/dispatch [:requests->get-by-proxy-id (:id p)])
+                        :onClick #(do (rf/dispatch [:requests->get-by-proxy-id (:id p)])
+                                      (rf/dispatch [:proxies->set-active-proxy (:id p)]))
                         :label "Requests"
                         :variant :light
                         :styles {:root {:border-radius "var(--mantine-radius-md)"}}
@@ -105,6 +123,8 @@
                                                      :stroke "1.5"}])}]
            [:> Divider]
            [:> NavLink {:href (routes/url-for :proxy-settings {:proxy-id (:id p)})
+                        :onClick #(do (rf/dispatch [:proxies->get-by-id (:id p)])
+                                      (rf/dispatch [:proxies->set-active-proxy (:id p)]))
                         :label "Settings"
                         :variant :light
                         :styles {:root {:border-radius "var(--mantine-radius-md)"}}
@@ -129,34 +149,43 @@
         [:div {:id "sidebar"
                :class "sidebar"}
          [:> Box {:class [:sidebar-content]
+                  :h "100%"
                   :bg "gray.1"}
-          [:> Stack
-           [:> Menu {:shadow :md
-                     :withArrow true}
-            [:> Menu.Target {:style {:cursor :pointer}}
-             [:> Group {:gap :xs
-                        :px "md"
-                        :pt "md"
-                        :mb "md"
-                        :align :center}
-              [:> Box {:w "36px"}
-               [:> Image
-                {:src "/images/brand/icon-green-white.svg"
-                 :fit :contain
-                 :w "100%"}]]
-              [:> Box {:style {:flexGrow 1}}
-               [:> Group {:gap :xs}
-                [:> Box {:maw "120px"
-                         :style {:flexGrow 1}}
-                 [:> Text {:size :md
-                           :fw 500
-                           :color :dark
-                           :truncate :end}
-                  (:name selected-workspace)]]
-                [:> IconChevronDown {:size "14"
-                                     :color "var(--mantine-color-gray-8)"
-                                     :stroke "3"}]]]]]
-            [workspaces-menu-dropdown @workspaces selected-workspace]]
+          [:> Stack {:gap 0
+                     :h "100%"}
+           [:> Box {:w "150px"
+                    :p :md}
+            [:> Image
+             {:src "/images/brand/icon-text.svg"
+              :fit :contain
+              :w "100%"}]]
+           (comment
+             [:> Menu {:shadow :md
+                       :withArrow true}
+              [:> Menu.Target {:style {:cursor :pointer}}
+               [:> Group {:gap :xs
+                          :px "md"
+                          :pt "md"
+                          :mb "md"
+                          :align :center}
+                [:> Box {:w "36px"}
+                 [:> Image
+                  {:src "/images/brand/icon-green-white.svg"
+                   :fit :contain
+                   :w "100%"}]]
+                [:> Box {:style {:flexGrow 1}}
+                 [:> Group {:gap :xs}
+                  [:> Box {:maw "120px"
+                           :style {:flexGrow 1}}
+                   [:> Text {:size :md
+                             :fw 500
+                             :color :dark
+                             :truncate :end}
+                    (:name selected-workspace)]]
+                  [:> IconChevronDown {:size "14"
+                                       :color "var(--mantine-color-gray-8)"
+                                       :stroke "3"}]]]]]
+              [workspaces-menu-dropdown @workspaces selected-workspace]])
            [:> Stack {:p :xs
                       :gap 0}
             [:> NavLink {:href (routes/url-for :home)
@@ -174,5 +203,15 @@
                          :color :gray
                          :leftSection (r/as-element [:> IconUsers
                                                      {:size 16
-                                                      :stroke "1.5"}])}]
-            [sources]]]]]))))
+                                                      :stroke "1.5"}])}]]
+           [:> Stack {:p :xs
+                      :style {:flex-grow 1
+                              :overflow "auto"}
+                      :gap 0}
+            [:> ScrollArea
+             {:type :auto
+              :scrollbarSize 6}
+             [sources]]]
+           ;; workspace settings
+           [:> Stack
+            [workspace-settings]]]]]))))

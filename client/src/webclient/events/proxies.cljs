@@ -48,7 +48,7 @@
 (rf/reg-event-fx
   :proxies->create-success
   (fn [{:keys [db]} [_ payload]]
-    {:navigate [:new-proxy-success]
+    {:navigate {:handler :new-proxy-success}
      :db (assoc db :proxies->new-proxy-info (:data payload))}))
 
 (rf/reg-event-fx
@@ -56,7 +56,7 @@
   (fn [{:keys [db]} [_ proxy-id]]
     {:fetch {:uri (str "/proxies/" proxy-id)
              :method "GET"
-             :success-fx [:proxies->set-by-id]}
+             :success-fxs [[:proxies->set-by-id]]}
      :db (assoc db :proxies->proxy-info {:loading? true
                                          :data (-> db :proxies->proxy-info :data)})}))
 

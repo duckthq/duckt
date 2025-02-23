@@ -16,7 +16,15 @@
     :description "Get to home page",
     :onClick #(rf/dispatch [:navigate {:handler :home}])
     :leftSection (r/as-element [:> IconHome {:size 24 :stroke 1.5}]),
-    }])
+    }
+
+   {:id "Customers"
+    :label "Customers"
+    :description "See all customers"
+    :onClick #(rf/dispatch [:navigate {:handler :customers}])
+    :leftSection (r/as-element
+                   [:> IconUsers {:size 20
+                                  :stroke 1.5}])}])
 
 (defn main []
   (let [is-mac? (rf/subscribe [:is-mac?])
@@ -52,15 +60,7 @@
                                                                              :params {:proxy-id (:id p)}}])
                                           :leftSection (r/as-element
                                                          [:> IconListTree {:size 20
-                                                                            :stroke 1.5}])}
-                                         {:id (str (:id p) "-customers")
-                                          :label (str (:name p) " Customers")
-                                          :description (:description p)
-                                          :onClick #(rf/dispatch [:navigate {:handler :proxy-customers
-                                                                             :params {:proxy-id (:id p)}}])
-                                          :leftSection (r/as-element
-                                                        [:> IconUsers {:size 20
-                                                                           :stroke 1.5}])}])
+                                                                            :stroke 1.5}])}])
                                       (:data @proxies))))]
         [:> Box {:id "topbar"
                  :style {:z-index 2}

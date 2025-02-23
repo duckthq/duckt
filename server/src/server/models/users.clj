@@ -4,9 +4,49 @@
             [pg.honey :as pg-honey]
             [pg.core :as pg]))
 
-(defn create [user]
-  (t/log! :debug "Creating user")
-  (pg-honey/insert-one @db/conn :users user {:returning [:*]}))
+(defn create-one
+  [{:keys [user workspace-id]}]
+  (t/log! :debug "Creating new user")
+  (with-open [conn (db/connection)]
+    (pg/with-tx [conn]
+      (let [new-user (pg-honey/insert-one
+                       conn :users {:email (:email user)
+                                    :fullname (:fullname user)
+                                    :username (:email user)
+                                    :password_hash (:password_hash user)}
+                       {:returning [:id, :email, :fullname]})
+            _ (pg-honey/insert-one conn
+                                   :user_preferences
+                                   {:user_id (:id new-user)
+                                    :selected_workspace workspace-id})
+
+            _ (pg-honey/insert-one conn
+                                   :user_workspaces
+                                   {:user_id (:id new-user)
+                                    :role (:role user)
+                                    :workspace_id workspace-id})]
+        (:id new-user)))))
+
+(defn update-one [user]
+  (t/log! :debug "Updating user")
+  (with-open [conn (db/connection)]
+    (pg-honey/update conn :users user)))
+
+(defn list-users [workspace-id]
+  (t/log! :debug "Getting users")
+  (with-open [conn (db/connection)]
+    (pg/with-tx [conn]
+      (let [workspace-users (pg-honey/find
+                        conn :user_workspaces
+                        {:workspace_id workspace-id}
+                        {:fields [:user_id :role]})
+            users (pg-honey/get-by-ids
+                   conn :users
+                   (mapv :user_id workspace-users)
+                   {:fields [:id :email :username :fullname
+                             :picture :email_verified]})]
+        {:users users
+         :workspace-users workspace-users}))))
 
 (defn get-one-by-email [email]
   (t/log! :debug "Getting user by email")

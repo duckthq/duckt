@@ -16,12 +16,13 @@
     [server.appconfig :as appconfig]
     [server.database :as db]
     ;; models
-    [server.models.users :as users]
+    [server.models.users :as users-model]
     [server.models.proxies :as proxies-model]
     ;; controllers
     [server.api.auth :as auth]
     [server.api.workspaces :as workspaces]
     [server.api.user :as user-ctrl]
+    [server.api.users :as users]
     [server.api.proxies :as proxies]
     [server.api.requests :as requests]
     [server.api.endpoints :as endpoints-ctrl]
@@ -44,7 +45,7 @@
     (if-let [token (:value (get-in req [:cookies "token"]))]
       (if-let [claims (verify-jwt-token token)]
         ;; TODO: get workspace and workspace permissions
-        (let [context (users/build-user-context (:sub claims))]
+        (let [context (users-model/build-user-context (:sub claims))]
           (t/log! :debug (str "Authenticated user: " (:user context)))
           (assoc req :context context))
         (-> (response {:error "Invalid token"})
@@ -99,6 +100,18 @@
   (GET "/userinfo" []
        (routes-handler
          user-ctrl/user-info))
+
+  (context "/users" []
+    (GET "/" []
+         (routes-handler
+           users/get-all))
+    (POST "/" []
+          (routes-handler
+            users/create-one))
+    (PUT "/:user-id" [user-id]
+         (routes-handler
+           users/update-one
+           {:user-id user-id})))
 
   (GET "/workspaces" []
        (routes-handler
