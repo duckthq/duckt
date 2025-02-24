@@ -53,6 +53,14 @@
     (response {:status "ok"
                :data updated-user})))
 
+(defn delete-one [req params & _]
+  (t/log! :debug "Deleting user")
+  (let [context (:context req)
+        user-id (:user-id params)
+        workspace-id (-> context :user-preferences :selected_workspace)]
+    (users/delete-by-id user-id workspace-id)
+    (response {:status "ok"})))
+
 (defn update-one [req params & _]
   (t/log! :debug "Updating user")
   (let [context (:context req)

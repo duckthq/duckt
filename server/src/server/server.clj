@@ -115,7 +115,11 @@
     (PUT "/:user-id/role" [user-id]
          (routes-handler
            users/update-role
-           {:user-id user-id})))
+           {:user-id user-id}))
+    (DELETE "/:user-id" [user-id]
+            (routes-handler
+              users/delete-one
+              {:user-id user-id})))
 
   (GET "/workspaces" []
        (routes-handler

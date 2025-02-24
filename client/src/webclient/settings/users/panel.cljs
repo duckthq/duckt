@@ -98,6 +98,7 @@
                             :size :xs
                             :data ["member" "admin" "owner"]}]
        [:> Button {:size :xs
+                   :onClick #(rf/dispatch [:users->delete (:id user)])
                    :variant :transparent
                    :disabled (= (count users) 1)
                    :color :red}
@@ -108,12 +109,14 @@
   (let [users (rf/subscribe [:users])]
     (rf/dispatch [:users->get])
     (fn []
-      [:> Stack {:p :md}
+      [:> Stack {:p :md
+                 :gap :xl}
        [:> Group
         [:> Box {:style {:flex-grow 1}}
          [title/page-title "Users settings"]]
         [button/Primary
          {:onClick #(rf/dispatch [:modal->open {:content [new-user-modal-content]}])
+          :size :sm
           :leftSection (r/as-element [:> IconUserPlus {:size 16}])}
          "Add user"]]
        [users-list (:data @users)]])))

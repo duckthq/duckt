@@ -37,6 +37,15 @@
                  :status nil})}))
 
 (rf/reg-event-fx
+  :users->delete
+  (fn [_ [_ user-id]]
+    {:fetch {:uri (str "/users/" user-id)
+             :method "DELETE"
+             :success-fxs [[:users->get]
+                           [:notifications->success {:title "User deleted!"
+                                                     :level :success}]]}}))
+
+(rf/reg-event-fx
   :users->update-role
   (fn [{:keys [db]} [_ user-id role]]
     {:fetch {:uri (str "/users/" user-id "/role")

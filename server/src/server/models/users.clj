@@ -59,6 +59,25 @@
                                       [:= :workspace_id workspace-id]]}))]
         updated-role))))
 
+(defn delete-by-id [user-id workspace-id]
+  (t/log! :debug "Deleting user")
+  (with-open [conn (db/connection)]
+    (pg/with-tx [conn]
+      (when-let [user-from-workspace (pg-honey/find-first
+                                       conn :user_workspaces
+                                       {:user_id user-id
+                                        :workspace_id workspace-id})]
+        (let [_ (pg-honey/delete
+                  conn :user_workspaces
+                  {:where [:= :user_id (:user_id user-from-workspace)]})
+              _ (pg-honey/delete
+                  conn :user_preferences
+                  {:where [:= :user_id (:user_id user-from-workspace)]})
+              _ (pg-honey/delete
+                  conn :users
+                  {:where [:= :id (:user_id user-from-workspace)]})]
+          :ok)))))
+
 (defn list-users [workspace-id]
   (t/log! :debug "Getting users")
   (with-open [conn (db/connection)]
