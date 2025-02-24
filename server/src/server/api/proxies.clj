@@ -38,7 +38,7 @@
                      :target-url (:target-url body)})]
     (response {:status "ok"
                :data (merge
-                       {:proxy-key (str "v1:" (:id (first new-proxy)) new-key)}
+                       {:proxy-key (str "v1:" (:id (first new-proxy)) ":" new-key)}
                        (first new-proxy))})))
 
 (defn generate-proxy-key [req params & _]

@@ -113,9 +113,9 @@
                                     :color "var(--mantine-color-gray-8)"
                                     :stroke "3"}]]]]
             [:> Menu.Dropdown
-             [:> Menu.Label "Settings"]
+             (comment [:> Menu.Label "Settings"]
              [:> Menu.Item "Profile"]
-             [:> Menu.Divider]
+             [:> Menu.Divider])
              [:> Menu.Item
               {:color "red"
                :onClick #(rf/dispatch [:auth->logout])}

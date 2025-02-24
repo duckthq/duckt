@@ -15,6 +15,9 @@
     ;; local imports
     [server.appconfig :as appconfig]
     [server.database :as db]
+    ;; middlewares
+    [server.middlewares.context :as middlewares.context]
+    [server.middlewares.auth :as middlewares.auth]
     ;; models
     [server.models.users :as users-model]
     [server.models.proxies :as proxies-model]
@@ -32,26 +35,6 @@
 (add-encoder java.time.OffsetDateTime cheshire.generate/encode-str)
 (add-encoder java.time.Instant cheshire.generate/encode-str)
 (add-encoder java.time.LocalDateTime cheshire.generate/encode-str)
-
-(defn verify-jwt-token [token]
-  (try
-    (jwt/unsign token appconfig/jwt-secret-key)
-    (catch Exception e
-      (t/log! :error (str "Error verifying token: " e))
-      nil)))
-
-(defn authenticate [req]
-    (t/log! :debug "Authenticating")
-    (if-let [token (:value (get-in req [:cookies "token"]))]
-      (if-let [claims (verify-jwt-token token)]
-        ;; TODO: get workspace and workspace permissions
-        (let [context (users-model/build-user-context (:sub claims))]
-          (t/log! :debug (str "Authenticated user: " (:user context)))
-          (assoc req :context context))
-        (-> (response {:error "Invalid token"})
-            (assoc :status 401)))
-      (-> (response {:error "No token provided"})
-          (assoc :status 401))))
 
 (defn server-info [_]
   ;; get cookies
@@ -77,20 +60,22 @@
   ([handler params query-params]
    (fn [req]
      (t/log! :debug "Route handler")
-     (-> req
-         authenticate
-         (handler params query-params)))))
+     (if-let [claims (middlewares.auth/authenticate-token req)]
+       (let [context (middlewares.context/user claims)]
+         (handler (assoc req :context context) params query-params))
+       (-> (response {:error "Unauthorized"})
+           (assoc :status 401))))))
 
 (defn proxy-handler
   ([handler] (proxy-handler handler {} {}))
   ([handler params] (proxy-handler handler params {}))
   ([handler params query-params]
    (fn [req]
-     ;(t/log! :debug (str "Params: " (:params req)))
      (t/log! :debug "Proxy handler")
-     (-> req
-         authenticate-proxy
-         (handler params query-params)))))
+     (if-let [req-with-context (middlewares.auth/authenticate-proxy req)]
+       (handler req-with-context params query-params)
+       (-> (response {:error "Unauthorized"})
+           (assoc :status 401))))))
 
 (defroutes app-routes
   (POST "/signup" [] auth/signup)

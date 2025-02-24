@@ -13,7 +13,7 @@
 (rf/reg-event-fx
  :auth->logout-success
  (fn [_ [_]]
-   {:navigate :login}))
+   {:navigate {:handler :login}}))
 
 (rf/reg-event-fx
  :auth->signup
@@ -31,7 +31,7 @@
 (rf/reg-event-fx
   :auth->signup-success
   (fn [_ [_]]
-    {:navigate :home}))
+    {:navigate {:handler :home}}))
 
 (rf/reg-event-fx
   :auth->login
@@ -39,9 +39,9 @@
     {:fetch {:uri "/login"
              :method "POST"
              :body form-info
-             :success-fx [:auth->login-success]}}))
+             :success-fxs [[:auth->login-success]]}}))
 
 (rf/reg-event-fx
   :auth->login-success
   (fn [_ [_]]
-    {:navigate :home}))
+    {:navigate {:handler :home}}))

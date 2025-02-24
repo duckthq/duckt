@@ -25,7 +25,7 @@
 
 (defn customers-list [customers proxy-id]
   [:> Stack
-   (for [customer customers]
+   (for [customer (:list customers)]
      ^{:key (:id customer)}
      [customer-list-item customer])])
 
@@ -37,6 +37,7 @@
   (let [customers (rf/subscribe [:customers])]
     (rf/dispatch [:customers->get])
     (fn []
+      (js/console.log "customers" (clj->js @customers))
       [:> Stack {:p :md}
        [title/page-title "Customers"]
        [:> Stack
