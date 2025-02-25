@@ -11,4 +11,5 @@ RUN npx shadow-cljs release app
 
 FROM nginx:alpine
 COPY --from=builder /app/resources/public /usr/share/nginx/html
+COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
