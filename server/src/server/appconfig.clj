@@ -1,15 +1,23 @@
 (ns server.appconfig
-  (:require [environ.core :refer [env]]))
+  (:require
+    [clojure.string :as string]))
 
 (def port
-  (int (env :port 4444)))
+  (parse-long (if (or (not (System/getenv "PORT"))
+               (string/blank? (System/getenv "PORT")))
+         4444
+         (System/getenv "PORT"))))
 
 (def jwt-secret-key
-  (env :jwt-secret-key "secret"))
+  (or (System/getenv "JWT_SECRET_KEY") "secret"))
 
 (def postgres
-  {:host (env :db-host "localhost")
-   :port (env :db-port 5432)
-   :user (env :db-user "duckt")
-   :password (env :db-password "duckt")
-   :database (env :db-name "duckt")})
+  {:host (or (System/getenv "DB_HOST") "localhost")
+   :port (parse-long (if (or (not (System/getenv "DB_PORT"))
+                             (string/blank? (System/getenv "DB_PORT")))
+                       5432
+                       (System/getenv "DB_PORT")))
+   :user (or (System/getenv "DB_USER") "duckt")
+   :password (or (System/getenv "DB_PASSWORD") "duckt")
+   :database (or (System/getenv "DB_NAME") "duckt")})
+(println :postgres postgres)

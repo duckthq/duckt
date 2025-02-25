@@ -17,7 +17,7 @@ docker-push-arm64: configure docker-tag-arm64
 docker-build:
 	docker build --platform linux/amd64 -t duckt-server:local .
 
-docker-tag: docker-build configure
+docker-tag: configure docker-build
 	docker tag duckt-server:local duckthq/server:$(VERSION)
 	docker tag duckt-server:local duckthq/server:latest
 
