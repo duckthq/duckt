@@ -18,9 +18,9 @@ docker-push-arm64: configure docker-tag-arm64
 	docker push duckthq/web-arm64:latest
 
 docker-build:
-	docker build --platform linux/amd64 --build-arg API_URL=https://api.duckt.dev -t duckt-web .
+	docker build --platform linux/amd64 --build-arg API_URL=https://api.duckt.dev -t duckt-web:local .
 
-docker-tag: docker-build configure
+docker-tag: configure docker-build
 	docker tag duckt-web:local duckthq/web:$(VERSION)
 	docker tag duckt-web:local duckthq/web:latest
 

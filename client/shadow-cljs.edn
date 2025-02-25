@@ -28,6 +28,10 @@
    {:app {:init-fn webclient.core/init}}
    ;:devtools
    ;{:preloads [re-frisk.preload]}
+   :release
+   {:compiler-options
+    {:closure-defines
+     {webclient.config/api-url #shadow/env ["API_URL" "http://localhost:4445"]}}}
    :dev
    {:compiler-options
     {:closure-defines
