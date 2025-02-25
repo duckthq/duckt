@@ -47,7 +47,7 @@
 
 (rf/reg-fx
   :fetch
-  (fn [{:keys [method uri query-params body success-fx failure-fx headers
+  (fn [{:keys [method uri query-params body success-fx failure-fxs headers
                success-fxs]}]
     (let [json-body (.stringify js/JSON (clj->js body))
           query-params-parser #(let [url-search-params (new js/URLSearchParams (clj->js %))]
@@ -77,30 +77,24 @@
                   (.then
                     (fn [json]
                       (let [payload (js->clj json :keywordize-keys true)]
-                        (when (not (.-ok response))
+                        (if (not (.-ok response))
                           (not-ok {:status (.-status response)
-                                   :on-failure #(throw (js/Error. (js/JSON.stringify json)))}))
-                        ;; maps every success-fx to a dispatch
-                        (mapv
-                          #(rf/dispatch [% payload (.-headers response)])
-                          success-fx)
-                        (mapv
-                          #(rf/dispatch (vec (flatten [% payload (.-headers response)])))
-                          success-fxs)))))))
+                                   :on-failure #(throw (js/Error. (js/JSON.stringify json)))})
+                          ;; maps every success-fx to a dispatch
+                          (do (mapv
+                                #(rf/dispatch [% payload (.-headers response)])
+                                success-fx)
+                              (mapv
+                                #(rf/dispatch (vec (flatten [% payload (.-headers response)])))
+                                success-fxs)))))))))
           ;; request error handling
           (.catch
             (fn [error]
-              (if (= (.-message error) "Failed to fetch")
-                (if (or (= failure-fx nil)
-                        (= (count failure-fx) 0))
-                  (.error js/console (js/JSON.parse (.-message error)))
-                  (mapv
-                    #(rf/dispatch [% (:message (.-message error))])
-                    failure-fx))
-
-                (if (or (= failure-fx nil)
-                        (= (count failure-fx) 0))
-                  (.error js/console "API request error" error)
-                  (mapv
-                    #(rf/dispatch [% error])
-                    failure-fx)))))))))
+              (if (or (= failure-fxs nil)
+                      (= (count failure-fxs) 0))
+                (.error js/console "API request error" error)
+                (mapv
+                  #(rf/dispatch (vec (flatten [% (js->clj (js/JSON.parse (.-message error))
+                                                          :keywordize-keys true)
+                                               (.-headers error)])))
+                  failure-fxs))))))))

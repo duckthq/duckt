@@ -18,10 +18,12 @@
 
 (defn validate-invite [invite-code]
   (if appconfig/invite-only?
-    (let [invites (string/split (System/getenv "INVITE_CODES") #",")]
-      (if (some #(= % invite-code) invites)
-        true
-        false))
+    (if-let [invites (System/getenv "INVITE_CODES")]
+      (let [codes-list (string/split invites #",")]
+        (if (some #(= % invite-code) codes-list)
+          true
+          false))
+      false)
     true))
 
 (defn signup [req]
@@ -52,8 +54,7 @@
   (t/log! :debug "Logging in")
   (let [{:keys [email password]} (:body req)]
     (if-let [user (users/get-one-by-email email)]
-      (let [_ (println :user user)
-            verify (buddy/verify password (:password_hash user))]
+      (let [verify (buddy/verify password (:password_hash user))]
         (if (:valid verify)
           (let [token (generate-jwt-token email)]
             ;; TODO: remove token from body

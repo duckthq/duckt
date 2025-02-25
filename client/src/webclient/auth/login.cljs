@@ -39,6 +39,7 @@
             [forms/input-field {:placeholder "Password"
                                 :on-change #(reset! password (.. % -target -value))
                                 :name "password"
+                                :autoComplete :on
                                 :required true
                                 :type "password"}]]
            [button/primary

@@ -4,13 +4,15 @@
 
 (defn input-field
   [{:keys [placeholder type on-change onChange required error
-           label description input-name id defaultValue]}]
+           label description input-name id defaultValue
+           autoComplete]}]
   [:> TextInput (merge
                   (when on-change {:onChange on-change})
                   (when onChange {:onChange onChange})
                   (when required {:required true
                                   :withAsterisk true})
                   (when error {:error error})
+                  (when autoComplete {:autoComplete autoComplete})
                   {:placeholder placeholder
                    :id id
                    :label label

@@ -14,13 +14,18 @@
         email-field (r/atom "")
         password-field (r/atom "")
         repeat-password-field (r/atom "")
+        invite-code (r/atom nil)
+        serverinfo (rf/subscribe [:serverinfo])
         on-submit #(do (.preventDefault %)
                        (when (and (= @password-field @repeat-password-field)
                                   (not (string/blank? @password-field)))
                          (rf/dispatch [:auth->signup
-                                       {:fullname @name-field
-                                        :email @email-field
-                                        :password @password-field}])))]
+                                       (merge
+                                         (when @invite-code
+                                           {:invite_code @invite-code})
+                                         {:fullname @name-field
+                                          :email @email-field
+                                          :password @password-field})])))]
     (fn []
       [:> Container {:size "xs"}
        [:> Group {:h "100vh"
@@ -51,26 +56,30 @@
                                 :on-change #(reset! password-field (.. % -target -value))
                                 :name "password"
                                 :required true
+                                :autoComplete :on
                                 :type "password"}]
             [forms/input-field (merge
                                  {:placeholder "Repeat your password"
                                   :on-change #(reset! repeat-password-field (.. % -target -value))
                                   :name "repeat-password"
                                   :required true
+                                  :autoComplete :on
                                   :type "password"}
                                  (when (and (not= @password-field @repeat-password-field)
                                             (not (string/blank? @password-field))
                                             (not (string/blank? @repeat-password-field)))
                                    {:error "Passwords do not match"}))]]
-           [forms/input-field {:placeholder "XCXCXCXC-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
-                               :name "invitation-code"
-                               :label "Invitation code"
-                               :description "We are invite-only for now."
-                               :type "text"}]
-           [button/primary
-            {:full? true
-             :type "submit"
-             :text "Create your account"}]]]
+           (when (:invite-only? @serverinfo)
+             [forms/input-field {:placeholder "XXXX-XXXX-XXXX"
+                                 :required true
+                                 :onChange #(reset! invite-code (.. % -target -value))
+                                 :name "invitation-code"
+                                 :label "Invitation code"
+                                 :description "We are invite-only for now."
+                                 :type "text"}])
+           [button/Primary
+            {:onClick on-submit}
+            "Create your account"]]]
          [:footer
           [:div
            [:> Text {:color "dark"}

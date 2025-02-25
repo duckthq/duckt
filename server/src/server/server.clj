@@ -39,20 +39,8 @@
 (defn server-info [_]
   ;; get cookies
   (t/log! :debug "server info")
-  (response {:server "Duckt Server"}))
-
-(defn authenticate-proxy [req]
-  (t/log! :debug "Authenticating proxy")
-  (let [token (get-in req [:headers "proxy-secret"])
-        proxy-id (get-in req [:headers "proxy-id"])
-        $proxy (proxies-model/get-proxy-by-id proxy-id)
-        verify (buddy/verify token (:proxy_key_hash $proxy))]
-    (if (:valid verify)
-      (assoc req :proxy-context {:workspace-id (:workspace_id $proxy)
-                                 :name (:name $proxy)
-                                 :id (:id $proxy)})
-      (-> (response {:error "Invalid proxy token"})
-          (assoc :status 401)))))
+  (response {:server "Duckt Server"
+             :invite-only? appconfig/invite-only?}))
 
 (defn routes-handler
   ([handler] (routes-handler handler {} {}))
