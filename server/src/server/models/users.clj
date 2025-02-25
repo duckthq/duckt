@@ -116,7 +116,7 @@
          :user-preferences user-preferences
          :workspace workspace}))))
 
-(defn register-new-user
+(defn register-first-workspace-user
   "This sets a new workspace and register the new user to it"
   [user]
   (t/log! :debug "Registering new user")
@@ -133,9 +133,8 @@
             user (pg-honey/insert-one conn
                                       :users
                                       user
-                                      {:returning [:id, :email, :username,
-                                                   :given_name, :family_name
-                                                   :picture, :email_verified]})
+                                      {:returning [:id, :email, :status
+                                                   :fullname, :email_verified]})
             _ (pg-honey/insert-one conn
                                    :user_preferences
                                    {:user_id (:id user)

@@ -1,5 +1,6 @@
 (ns server.api.auth
   (:require
+    [clojure.string :as string]
     [cheshire.core :refer [generate-string]]
     [buddy.hashers :as buddy]
     [ring.util.response :refer [response]]
@@ -15,24 +16,37 @@
         token (jwt/sign claims appconfig/jwt-secret-key)]
     token))
 
+(defn validate-invite [invite-code]
+  (if appconfig/invite-only?
+    (let [invites (string/split (System/getenv "INVITE_CODES") #",")]
+      (if (some #(= % invite-code) invites)
+        true
+        false))
+    true))
+
 (defn signup [req]
   (t/log! :debug "Signing up")
   (let [user (:body req)
         existing-user (users/get-one-by-email (:email user))]
     (if (> (count existing-user) 0)
       (generate-string {:error "User already exists"})
-      (let [res (users/register-new-user {:email (:email user)
-                                          :fullname (:fullname user)
-                                          :password_hash (buddy/derive (:password user))
-                                          :username (:email user)})
-            claims {:sub (:email user)
-                    :exp (+ (System/currentTimeMillis) 3600000)
-                    :iss "mainframe"}
-            token (jwt/sign claims appconfig/jwt-secret-key)]
-        (-> (response {:data res})
-            (assoc :headers {"Authorization" token})
-            (assoc :cookies {"token" {:value token}})
-            (assoc :status 201))))))
+      (if-let [_ (validate-invite (:invite_code user))]
+        (let [res (users/register-first-workspace-user
+                    {:email (:email user)
+                     :fullname (:fullname user)
+                     :status :active
+                     :password_hash (buddy/derive (:password user))
+                     :username (:email user)})
+              claims {:sub (:email user)
+                      :exp (+ (System/currentTimeMillis) 3600000)
+                      :iss "mainframe"}
+              token (jwt/sign claims appconfig/jwt-secret-key)]
+          (-> (response {:data res})
+              (assoc :headers {"Authorization" token})
+              (assoc :cookies {"token" {:value token}})
+              (assoc :status 201)))
+        (-> (response {:error "Invalid invite code"})
+            (assoc :status 401))))))
 
 (defn login [req]
   (t/log! :debug "Logging in")

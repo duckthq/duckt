@@ -5,6 +5,16 @@
     (parse-long (System/getenv "PORT"))
     4444))
 
+(def log-level
+  (if (System/getenv "LOG_LEVEL")
+    (keyword (System/getenv "LOG_LEVEL"))
+    :info))
+
+(def invite-only?
+  (if (System/getenv "INVITE_ONLY")
+    (System/getenv "INVITE_ONLY")
+    false))
+
 (def jwt-secret-key
   (or (System/getenv "JWT_SECRET_KEY") "secret"))
 
