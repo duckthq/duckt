@@ -12,34 +12,34 @@ jobs:
       contents: write  # Add this line to grant release permissions
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
-          
+
       - name: Install Clojure Tools
         uses: DeLaGuardo/setup-clojure@12.0
         with:
           lein: '2.10.0'
-          
+
       - name: Get version
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-          
+
       - name: Build server uberjar
         run: cd server && lein uberjar
-        
+
       - name: Build proxy uberjar
         run: cd proxy && lein uberjar
-        
-      - name: Rename jar files
+
+      - name: Rename and relocate jar files
         run: |
           mkdir -p artifacts
-          find server/target -name "*-standalone.jar" -exec cp {} artifacts/server-standalone-${{ env.VERSION }}.jar \;
-          find proxy/target -name "*-standalone.jar" -exec cp {} artifacts/proxy-standalone-${{ env.VERSION }}.jar \;
-        
+          find server/target/uberjar -name "*-standalone.jar" -exec cp {} artifacts/server-standalone-${{ env.VERSION }}.jar \;
+          find proxy/target/uberjar -name "*-standalone.jar" -exec cp {} artifacts/proxy-standalone-${{ env.VERSION }}.jar \;
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
