@@ -36,7 +36,7 @@
         (let [res (users/register-first-workspace-user
                     {:email (:email user)
                      :fullname (:fullname user)
-                     :status :active
+                     :status "active"
                      :password_hash (buddy/derive (:password user))
                      :username (:email user)})
               claims {:sub (:email user)
