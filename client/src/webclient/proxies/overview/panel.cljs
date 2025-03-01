@@ -91,14 +91,12 @@
 
          [:> BarChart {:data (clj->js data)
                         :dataKey "date"
-                        :curveType "monotone"
                         :yAxisProps {:orientation :right
                                      :tickMargin 20}
                         :gridAxis "none"
                         :withLegend true
                         :legendProps {:verticalAlign :bottom}
                         :barProps {:radius 10}
-                        :dotProps {:r 0}
                         :tooltipAnimationDuration 200
                         :strokeWidth 1
                         :series [{:name "all" :color "gray.6"}

@@ -43,7 +43,7 @@
              :success-fxs [[:proxies->get]
                            [:notifications->success {:title "Proxy deleted!"
                                                      :level :success}]
-                           [:navigate :home]]}}))
+                           [:navigate {:handler :home}]]}}))
 
 (rf/reg-event-fx
   :proxies->create-success
