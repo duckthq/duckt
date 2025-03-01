@@ -52,7 +52,7 @@
   (let [proxies (rf/subscribe [:proxies])]
     (rf/dispatch [:proxies->get])
 
-    (fn []
+    (fn [userinfo]
       [:> Stack {:style {:flexGrow 1}}
        [:> Group {:component "header"
                   :pos :sticky
@@ -67,13 +67,14 @@
                   :fw 600
                   :color :gray}
          "Proxies"]
-        [:> Tooltip {:label "Create new proxy"
-                     :position :right
-                     :withArrow true}
-         [:> Anchor {:href (routes/url-for :new-proxy)}
-          [:> IconCirclePlus
-           {:color :gray
-            :size 16}]]]]
+        (when (contains? #{"admin" "owner"} (:role userinfo))
+          [:> Tooltip {:label "Create new proxy"
+                       :position :right
+                       :withArrow true}
+           [:> Anchor {:href (routes/url-for :new-proxy)}
+            [:> IconCirclePlus
+             {:color :gray
+              :size 16}]]])]
        (when (and (not (:loading? @proxies))
                   (empty? (:data @proxies)))
          [:> NavLink {:href (routes/url-for :new-proxy)
@@ -121,21 +122,24 @@
                         :leftSection (r/as-element [:> IconListTree
                                                     {:size 16
                                                      :stroke "1.5"}])}]
-           [:> Divider]
-           [:> NavLink {:href (routes/url-for :proxy-settings {:proxy-id (:id p)})
-                        :onClick #(do (rf/dispatch [:proxies->get-by-id (:id p)])
-                                      (rf/dispatch [:proxies->set-active-proxy (:id p)]))
-                        :label "Settings"
-                        :variant :light
-                        :styles {:root {:border-radius "var(--mantine-radius-md)"}}
-                        :color :gray
-                        :leftSection (r/as-element [:> IconSettings
-                                                    {:size 16
-                                                     :stroke "1.5"}])}]])]])))
+           (when (contains? #{"admin" "owner"} (:role userinfo))
+             [:<>
+              [:> Divider]
+              [:> NavLink {:href (routes/url-for :proxy-settings {:proxy-id (:id p)})
+                           :onClick #(do (rf/dispatch [:proxies->get-by-id (:id p)])
+                                         (rf/dispatch [:proxies->set-active-proxy (:id p)]))
+                           :label "Settings"
+                           :variant :light
+                           :styles {:root {:border-radius "var(--mantine-radius-md)"}}
+                           :color :gray
+                           :leftSection (r/as-element [:> IconSettings
+                                                       {:size 16
+                                                        :stroke "1.5"}])}]])])]])))
 
 (defn main []
   (let [user (rf/subscribe [:user->userinfo])
         workspaces (rf/subscribe [:workspaces])
+        userinfo (rf/subscribe [:user->userinfo])
         ;theme (js->clj (useMantineTheme) :keywordize-keys true)
         ]
     (rf/dispatch [:workspaces->get])
@@ -211,7 +215,7 @@
             [:> ScrollArea
              {:type :auto
               :scrollbarSize 6}
-             [sources]]]
+             [sources @userinfo]]]
            ;; workspace settings
            [:> Stack
             [workspace-settings]]]]]))))

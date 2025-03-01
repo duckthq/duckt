@@ -75,38 +75,44 @@
              "Add user"]]])))
     (finally #(rf/dispatch [:users->reset-new-user-information]))))
 
-(defn users-list [users]
-  [:> Stack
-   (for [user users]
-     ^{:key (:id user)}
-     [:> Box
-      [:> Group {:p :md}
-       [:> Group {:style {:flex-grow 1}}
-        [:> Avatar {:color "initials"
-                    :variant :filled
-                    :size :sm
-                    :name (:fullname user)}]
-        [:> Stack {:gap 0}
-         [text/Base {:size :md}
-          (:fullname user)]
-         [text/Dimmed {:size :xs}
-          (:email user)]]]
-       [:> Divider {:orientation :vertical}]
-       [forms/select-field {:defaultValue (:role user)
-                            :onChange #(rf/dispatch [:users->update-role (:id user) %])
-                            :disabled (= (count users) 1)
-                            :size :xs
-                            :data ["member" "admin" "owner"]}]
-       [:> Button {:size :xs
-                   :onClick #(rf/dispatch [:users->delete (:id user)])
-                   :variant :transparent
-                   :disabled (= (count users) 1)
-                   :color :red}
-        "Delete"]]
-      [:> Divider]])])
+(defn users-list []
+  (fn [users userinfo]
+    [:> Stack
+     (doall
+       (for [user users]
+         ^{:key (:id user)}
+         [:> Box
+          [:> Group {:p :md}
+           [:> Group {:style {:flex-grow 1}}
+            [:> Avatar {:color "initials"
+                        :variant :filled
+                        :size :sm
+                        :name (:fullname user)}]
+            [:> Stack {:gap 0}
+             [text/Base {:size :md}
+              (:fullname user)]
+             [text/Dimmed {:size :xs}
+              (:email user)]]]
+           (if (contains? #{"admin" "owner"} (:role userinfo))
+             [:<>
+              [forms/select-field {:defaultValue (:role user)
+                                   :onChange #(rf/dispatch [:users->update-role (:id user) %])
+                                   :disabled (= (count users) 1)
+                                   :size :xs
+                                   :data ["member" "admin" "owner"]}]
+              [:> Divider {:orientation :vertical}]
+              [:> Button {:size :xs
+                          :onClick #(rf/dispatch [:users->delete (:id user)])
+                          :variant :transparent
+                          :disabled (= (count users) 1)
+                          :color :red}
+               "Delete"]]
+             [:> Text {:size :sm} (:role user)])]
+          [:> Divider]]))]))
 
 (defn main []
-  (let [users (rf/subscribe [:users])]
+  (let [users (rf/subscribe [:users])
+        userinfo (rf/subscribe [:user->userinfo])]
     (rf/dispatch [:users->get])
     (fn []
       [:> Stack {:p :md
@@ -114,9 +120,10 @@
        [:> Group
         [:> Box {:style {:flex-grow 1}}
          [title/page-title "Users settings"]]
-        [button/Primary
-         {:onClick #(rf/dispatch [:modal->open {:content [new-user-modal-content]}])
-          :size :sm
-          :leftSection (r/as-element [:> IconUserPlus {:size 16}])}
-         "Add user"]]
-       [users-list (:data @users)]])))
+        (when (contains? #{"admin" "owner"} (:role @userinfo))
+          [button/Primary
+           {:onClick #(rf/dispatch [:modal->open {:content [new-user-modal-content]}])
+            :size :sm
+            :leftSection (r/as-element [:> IconUserPlus {:size 16}])}
+           "Add user"])]
+       [users-list (:data @users) @userinfo]])))

@@ -9,6 +9,7 @@
         user (:user context)
         user-preferences (:user-preferences context)]
     (response {:data {:id (:id user)
+                      :role (:role user)
                       :email (:email user)
                       :username (:username user)
                       :profile (:profile user)

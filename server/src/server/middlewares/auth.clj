@@ -19,6 +19,20 @@
     (when-let [claims (verify-jwt-token token)]
       claims)))
 
+(def authorization-levels
+  {:member 0
+   :admin 1
+   :owner 2})
+
+(defn authorize-user [context permissions]
+  (t/log! :debug "Authorizing user")
+  (let [role (-> context :user :role)
+        user-access-level ((keyword role) authorization-levels)
+        resource-access-level (if permissions
+                                ((keyword permissions) authorization-levels)
+                                0)]
+    (>= user-access-level resource-access-level)))
+
 (defn authenticate-proxy [req]
   (t/log! :debug "Authenticating proxy")
   (let [token (get-in req [:headers "proxy-secret"])

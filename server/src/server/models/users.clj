@@ -110,9 +110,12 @@
                    conn :users {:email email})
             user-preferences (pg-honey/find-first
                                conn :user_preferences {:user_id (:id user)})
+            user-workspace (pg-honey/find-first
+                            conn :user_workspaces {:user_id (:id user)})
             workspace (pg-honey/find-first
                         conn :workspaces {:id (:workspace_id user-preferences)})]
-        {:user user
+        {:user (merge user
+                      {:role (:role user-workspace)})
          :user-preferences user-preferences
          :workspace workspace}))))
 

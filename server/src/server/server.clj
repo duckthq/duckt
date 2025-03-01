@@ -39,14 +39,19 @@
              :invite-only? appconfig/invite-only?}))
 
 (defn routes-handler
-  ([handler] (routes-handler handler {} {}))
-  ([handler params] (routes-handler handler params {}))
-  ([handler params query-params]
+  ([handler] (routes-handler handler {} {} {}))
+  ([handler params] (routes-handler handler params {} {}))
+  ([handler params query-params endpoint-configs]
    (fn [req]
      (t/log! :debug "Route handler")
      (if-let [claims (middlewares.auth/authenticate-token req)]
        (let [context (middlewares.context/user claims)]
-         (handler (assoc req :context context) params query-params))
+         (if-let [_ (middlewares.auth/authorize-user
+                      context
+                      (:permissions endpoint-configs))]
+           (handler (assoc req :context context) params query-params)
+           (-> (response {:error "Forbidden"})
+               (assoc :status 403))))
        (-> (response {:error "Unauthorized"})
            (assoc :status 401))))))
 
@@ -80,15 +85,18 @@
     (PUT "/:user-id" [user-id]
          (routes-handler
            users/update-one
-           {:user-id user-id}))
+           {:user-id user-id}
+           {} {:permissions :admin}))
     (PUT "/:user-id/role" [user-id]
          (routes-handler
            users/update-role
-           {:user-id user-id}))
+           {:user-id user-id}
+           {} {:permissions :admin}))
     (DELETE "/:user-id" [user-id]
             (routes-handler
               users/delete-one
-              {:user-id user-id})))
+              {:user-id user-id}
+              {} {:permissions :admin})))
 
   (GET "/workspaces" []
        (routes-handler
@@ -120,20 +128,24 @@
           :request-id request-id}))
   (POST "/proxies" []
         (routes-handler
-          proxies/create-proxy))
+          proxies/create-proxy
+          {} {} {:permissions :admin}))
   (PUT "/proxies/:proxy-id" [proxy-id]
        (routes-handler
          proxies/update-proxy-by-id
-         {:proxy-id proxy-id}))
+         {:proxy-id proxy-id}
+         {} {:permissions :admin}))
   (POST "/proxies/:proxy-id/generate-key" [proxy-id]
        (routes-handler
          proxies/generate-proxy-key
-         {:proxy-id proxy-id}))
+         {:proxy-id proxy-id}
+         {} {:permissions :admin}))
 
   (DELETE "/proxies/:proxy-id" [proxy-id]
           (routes-handler
             proxies/delete-proxy-by-id
-            {:proxy-id proxy-id}))
+            {:proxy-id proxy-id}
+            {} {:permissions :admin}))
 
   (GET "/requests/:request-id" [request-id]
        (routes-handler
