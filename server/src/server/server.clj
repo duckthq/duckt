@@ -4,14 +4,12 @@
     [compojure.handler :as handler]
     [compojure.route :as route]
     [cheshire.generate :refer [add-encoder]]
-    [buddy.hashers :as buddy]
     [ring.middleware.json :refer [wrap-json-response wrap-json-body]]
     [ring.middleware.cookies :as cookies]
     [jumblerg.middleware.cors :refer [wrap-cors]]
     [ring.util.response :refer [response]]
     [ring.adapter.jetty :as jetty]
     [taoensso.telemere :as t]
-    [buddy.sign.jwt :as jwt]
     ;; local imports
     [server.appconfig :as appconfig]
     [server.database :as db]
@@ -19,8 +17,6 @@
     [server.middlewares.context :as middlewares.context]
     [server.middlewares.auth :as middlewares.auth]
     ;; models
-    [server.models.users :as users-model]
-    [server.models.proxies :as proxies-model]
     ;; controllers
     [server.api.auth :as auth]
     [server.api.workspaces :as workspaces]

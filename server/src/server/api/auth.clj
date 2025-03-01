@@ -44,8 +44,12 @@
                       :iss "mainframe"}
               token (jwt/sign claims appconfig/jwt-secret-key)]
           (-> (response {:data res})
-              (assoc :headers {"Authorization" token})
-              (assoc :cookies {"token" {:value token}})
+              (assoc :cookies {"token" {:value token
+                                        :same-site :none
+                                        :secure true
+                                        :http-only true
+                                        :path "/"
+                                        :max-age 864000}})
               (assoc :status 201)))
         (-> (response {:error "Invalid invite code"})
             (assoc :status 401))))))
@@ -59,8 +63,12 @@
           (let [token (generate-jwt-token email)]
             ;; TODO: remove token from body
             (-> (response {:status "ok"})
-                (assoc :headers {"Authorization" token})
-                (assoc :cookies {"token" {:value token}})
+                (assoc :cookies {"token" {:value token
+                                          :same-site :none
+                                          :secure true
+                                          :http-only true
+                                          :path "/"
+                                          :max-age 864000}})
                 (assoc :status 200)))
           (-> (response {:error "Invalid credentials"})
               (assoc :status 401))))

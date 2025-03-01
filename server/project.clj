@@ -1,4 +1,4 @@
-(defproject duckt-server "0.0.1-unstable-SNAPSHOT"
+(defproject duckt-server "0.0.1-SNAPSHOT"
   :description ""
   :url "https://duckt.dev"
   :license {:name "AGPL-3.0"
