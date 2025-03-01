@@ -5,7 +5,7 @@
     ["dayjs" :as dayjs]
     ["@mantine/core" :refer [Text Group Stack Box
                              SegmentedControl]]
-    ["@mantine/charts" :refer [AreaChart]]
+    ["@mantine/charts" :refer [AreaChart BarChart]]
     [webclient.components.h :as h]
     [webclient.routes :as routes]))
 
@@ -89,7 +89,7 @@
                                  :radius :xl
                                  :fullWidth true}]]]
 
-         [:> AreaChart {:data (clj->js data)
+         [:> BarChart {:data (clj->js data)
                         :dataKey "date"
                         :curveType "monotone"
                         :yAxisProps {:orientation :right
@@ -97,6 +97,7 @@
                         :gridAxis "none"
                         :withLegend true
                         :legendProps {:verticalAlign :bottom}
+                        :barProps {:radius 10}
                         :dotProps {:r 0}
                         :tooltipAnimationDuration 200
                         :strokeWidth 1
