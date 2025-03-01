@@ -54,7 +54,7 @@
                [h/h5 "You may also run the container locally"]
                [:> Paper {:withBorder true
                           :p :md}
-                [:> Group {:justify :end}
+                [:> Group
                  [:> Code
                   (str "docker run --rm -it -p 4445:4445"
                        " -e PROXY_TOKEN=" (:proxy-key proxy-info) " " (:image a))]]]]]]))]])))
