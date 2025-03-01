@@ -6,7 +6,7 @@
   (or (System/getenv "PROXY_PORT") "4445"))
 
 (def duckt-server-url
-  (System/getenv "DUCKT_SERVER_URL"))
+  (or (System/getenv "DUCKT_SERVER_URL") "https://api.duckt.dev"))
 
 ;; token format: base64 encoded string of the form "<version>:<proxy-uuid>:<secret>"
 (def proxy-token
