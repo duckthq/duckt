@@ -62,18 +62,21 @@ release:
 	$(call print_logo)
 	$(call print_tag)
 	$(call print_build_info)
-	$(call get_version)
-	$(call echo_step,Starting release process for version: $(shell cat .version))
-	$(call echo_step,Creating git tag v$(shell cat .version)...)
-	@git tag -a $(shell cat .version) -m "Release $(shell cat .version)"
-	$(call echo_step,Pushing to the repository...)
-	@git push --tags origin main
-	@echo ""
-	@echo "  ╔═══════════════════════════════════════════╗"
-	@echo "  ║                                           ║"
-	@echo "  ║  🦆 DUCKT.DEV RELEASED SUCCESSFULLY! 🦆   ║"
-	@echo "  ║                                           ║"
-	@echo "  ╚═══════════════════════════════════════════╝"
-	@echo "Quack!"
-	@echo ""
-	@rm -f .version
+	@echo "Enter version for new release (e.g., 1.2.3):"
+	@read VERSION && \
+		echo "Creating release for version: $$VERSION" && \
+		echo "▶ Starting release process for version: $$VERSION" && \
+		echo "▶ Creating git tag $$VERSION..." && \
+		git tag -a $$VERSION -m "Release $$VERSION" && \
+		echo "✓ Tag created successfully!" && \
+		echo "▶ Pushing to the repository..." && \
+		git push --tags origin main && \
+		echo "✓ Pushed to the repository successfully!" && \
+		echo "" && \
+		echo "  ╔═══════════════════════════════════════════╗" && \
+		echo "  ║                                           ║" && \
+		echo "  ║  🦆 DUCKT.DEV RELEASED SUCCESSFULLY! 🦆   ║" && \
+		echo "  ║                                           ║" && \
+		echo "  ╚═══════════════════════════════════════════╝" && \
+		echo "Quack!" && \
+		echo ""
