@@ -8,6 +8,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Add this line to grant release permissions
     steps:
       - uses: actions/checkout@v4
       
@@ -22,17 +24,25 @@ jobs:
         with:
           lein: '2.10.0'
           
+      - name: Get version
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          
       - name: Build server uberjar
         run: cd server && lein uberjar
         
       - name: Build proxy uberjar
         run: cd proxy && lein uberjar
         
+      - name: Rename jar files
+        run: |
+          mkdir -p artifacts
+          find server/target -name "*-standalone.jar" -exec cp {} artifacts/server-standalone-${{ env.VERSION }}.jar \;
+          find proxy/target -name "*-standalone.jar" -exec cp {} artifacts/proxy-standalone-${{ env.VERSION }}.jar \;
+        
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            server/target/*-standalone.jar
-            proxy/target/*-standalone.jar
+          files: artifacts/*.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
