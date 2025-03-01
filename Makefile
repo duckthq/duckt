@@ -3,4 +3,3 @@ configure:
 
 release: configure
 	git tag -a $(VERSION)
-	gh release create
