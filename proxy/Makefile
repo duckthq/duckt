@@ -1,7 +1,6 @@
 .PHONY: build tag push
 
-configure:
-	$(eval export VERSION=$(shell bash -c 'read -p "Version: " version; echo $$version'))
+VERSION := $(shell git describe --tags --abbrev=0 2>/dev/null || echo "dev")
 
 docker-build-arm64:
 	docker build --platform linux/arm64 -t duckt-proxy-arm64:local .
