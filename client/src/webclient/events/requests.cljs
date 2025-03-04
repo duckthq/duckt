@@ -27,13 +27,22 @@
                          :data (:data requests)})))
 
 (rf/reg-event-fx
+  :requests->load-more
+  (fn [{:keys [db]} [_ proxy-id]]
+    (let [filters (-> db :requests :filters)
+          limit (get filters "limit")]
+      {:fx [[:dispatch [:requests->filter
+                        {"limit" (if limit (+ (int limit) 100) 200)}
+                        proxy-id]]]})))
+
+(rf/reg-event-fx
   :requests->filter
   (fn [_ [_ filters proxy-id]]
     (let [url (js/URL. js/window.location.href)
-          search-params (.-searchParams url)]
-      (.forEach search-params
-                (fn [_ k] (.delete search-params k)))
-      (doseq [[k v] filters]
+          search-params (.-searchParams url)
+          search-params-clj (into {} (js->clj (for [q search-params] q)))
+          merged-params (merge search-params-clj filters)]
+      (doseq [[k v] merged-params]
         (.set search-params (name k) v))
       (.pushState js/history nil "" url))
     {:fx [[:dispatch [:requests->get-by-proxy-id proxy-id]]]}))

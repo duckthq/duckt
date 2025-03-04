@@ -69,10 +69,10 @@
                (merge
                  (when-let [name (:name body)] {:name name})
                  (when-let [description (:description body)] {:description description})
-                 (when-let [request-headers-keys (:request-headers-keys body)]
-                   {:request-headers-keys request-headers-keys})
-                 (when-let [response-headers-keys (:response-headers-keys body)]
-                   {:response-headers-keys response-headers-keys})
+                 (when-let [request-headers-config (:request-headers-config body)]
+                   {:request-headers-config request-headers-config})
+                 (when-let [response-headers-config (:response-headers-config body)]
+                   {:response-headers-config response-headers-config})
                  (when-let [target-url (:target-url body)] {:target-url target-url})
                  (when-let [host-url (:host-url body)] {:host-url host-url})))})))
 

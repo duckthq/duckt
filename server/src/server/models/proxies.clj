@@ -53,16 +53,21 @@
                    :request_headers_config]})))
 
 (defn update-proxy-by-id
-  [workspace-id proxy-id {:keys [name description
-                                 target-url host-url]}]
+  [workspace-id proxy-id {:keys [name description target-url host-url
+                                 response-headers-config request-headers-config]}]
   (t/log! :debug (str "Updating proxy model for " proxy-id))
   (with-open [conn (db/connection)]
     (pg-honey/update
       conn :proxies
-      {:name name
-       :description description
-       :target_url target-url
-       :host_url host-url}
+      (merge
+        (when response-headers-config
+          {:response_headers_config response-headers-config})
+        (when request-headers-config
+          {:request_headers_config request-headers-config})
+        {:name name
+         :description description
+         :target_url target-url
+         :host_url host-url})
       {:where [:and
                [:= :id proxy-id]
                [:= :workspace_id workspace-id]]

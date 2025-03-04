@@ -51,23 +51,26 @@
                                             (string/split
                                               (string/lower-case http-methods)
                                               #",")))
+                          :start-date (when-let [start-date (get query-params "start_date")]
+                                        (Instant/parse start-date))
+                          :end-date (when-let [end-date (get query-params "end_date")]
+                                      (Instant/parse end-date))
                           :customer-ids (when-let [customer-ids (get query-params "customer_ids")]
                                           (when-not (string/blank? customer-ids)
-                                            (map parse-long
-                                                 (string/split customer-ids #","))))
-                          :customer-subs (when-let [customer-subs (get query-params "customer_subs")]
-                                          (when-not (string/blank? customer-subs)
-                                            (map parse-long
-                                                 (string/split customer-subs #","))))
+                                            (string/split customer-ids #",")))
+                          :customers-subs (when-let [customers-subs (get query-params "customers_subs")]
+                                            (when-not (string/blank? customers-subs)
+                                              (string/split customers-subs #",")))
                           :endpoints-ids (when-let [endpoints-ids (get query-params "endpoints_ids")]
                                            (when-not (string/blank? endpoints-ids)
-                                             (map parse-long
-                                                  (string/split endpoints-ids #","))))
+                                             (string/split endpoints-ids #",")))
                           :order-by (get query-params "order_by") ;; field
                           :order (get query-params "order") ;; :asc or :desc
                           :customer-id (get query-params "customer_id")
                           :endpoint-id (get query-params "endpoint_id")
-                          :limit (or (get query-params "limit") 50)
+                          :limit (if-let [limit (get query-params "limit")]
+                                   (parse-long limit)
+                                   100)
                           :offset (or (get query-params "offset") 0)})]
     (response {:status "ok"
                :data requests})))
