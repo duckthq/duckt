@@ -58,7 +58,6 @@
                   :pos :sticky
                   :top 0
                   :left 0
-                  :bg "gray.1"
                   :style {:borderBottom "1px solid var(--mantine-color-gray-3)"
                           :z-index 1}
                   :pb "4px"}
@@ -153,9 +152,10 @@
         [:div {:id "sidebar"
                :class "sidebar"}
          [:> Box {:class [:sidebar-content]
-                  :h "100%"
-                  :bg "gray.1"}
+                  :styles {:root {:border-right "1px solid var(--mantine-color-gray-3)"}}
+                  :h "100%"}
           [:> Stack {:gap 0
+                     :styles {:root {:border-right "1px solid var(--mantine-color-gray-3)"}}
                      :h "100%"}
            [:> Box {:w "150px"
                     :p :md}

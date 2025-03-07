@@ -10,7 +10,6 @@
 (defn panel []
   (let [name (r/atom nil)
         target-url (r/atom nil)
-        proxy-host (r/atom nil)
         description (r/atom nil)]
     (fn []
       [:> Stack {:gap :xl
@@ -30,7 +29,6 @@
                                (rf/dispatch [:proxies->create
                                              {:name @name
                                               :target-url @target-url
-                                              :host-url @proxy-host
                                               :description @description}]))}
         [:section {:id "new-proxy-content"}
          [:> Grid
@@ -47,12 +45,6 @@
                                 :on-change #(reset! target-url (.. % -target -value))
                                 :label "Target URL"
                                 :description "The URL this proxy will point to"
-                                :required true}]
-            [forms/input-field {:placeholder "https://example.com"
-                                :name "proxy-host"
-                                :on-change #(reset! proxy-host (.. % -target -value))
-                                :label "Proxy Host"
-                                :description "The URL this proxy will be accessed from"
                                 :required true}]
             [forms/textarea-field {:placeholder "Description"
                                    :name "description"

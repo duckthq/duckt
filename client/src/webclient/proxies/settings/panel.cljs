@@ -2,7 +2,7 @@
   (:require
     [re-frame.core :as rf]
     [reagent.core :as r]
-    ["@mantine/core" :refer [Paper Stack Group Divider Tooltip Button]]
+    ["@mantine/core" :refer [Paper Stack Group Divider Tooltip Button Radio Text]]
     ["@tabler/icons-react" :refer [IconInfoCircle]]
     [webclient.components.ui.title :as title]
     [webclient.components.forms :as forms]
@@ -70,43 +70,72 @@
           [:> IconInfoCircle {:size 20 :stroke 1.5}]]]]]]]
     (finally (rf/dispatch [:proxies->clean-swapped-key-from-memory]))))
 
+(defn- networking-info [info]
+  (let [proxy-info-target-url (r/atom (:target_url info))]
+    (fn [info]
+      [:> Stack {:maw 700
+                 :pb :xl}
+       [title/h3 "Networking configuration"]
+       [:> Stack
+        [forms/input-field
+         {:label "Target URL"
+          :onChange #(reset! proxy-info-target-url (-> % .-target .-value))
+          :defaultValue @proxy-info-target-url}]
+        [:> Radio.Group
+         {:value "partial"
+          :onChange #(println %)}
+         [:> Stack {:gap :xs}
+          [:> Radio.Card
+           {:value "partial"
+            :p :sm}
+           [:> Group {:align :flex-start}
+            [:> Radio.Indicator]
+            [:> Stack {:gap :xs}
+             [:> Text "Partial"]
+             [:> Text {:size :md
+                       :color :dimmed}
+              "Proxy only requests that match the target URL will be forwarded."]]]]
+          [:> Radio.Card
+           {:value "full"}
+           [:> Stack
+            [text/Base {:fw 600} "Full"]
+            [text/Dimmed {:size :md}
+             "All requests will be forwarded to the target URL."]]]]]
+
+        [:> Group {:align :end
+                   :justify :end}
+         [button/primary
+          {:text "Save"
+           :on-click #(rf/dispatch [:proxies->update
+                                    (:id info)
+                                    {:target-url @proxy-info-target-url}])}]]]])))
+
+
 (defn- basic-info [info]
   (let [proxy-info-name (r/atom (:name info))
-        proxy-info-target-url (r/atom (:target_url info))
-        proxy-info-host-url (r/atom (:host_url info))
         proxy-info-description (r/atom (:description info))]
-  (fn [info]
-    [:> Stack {:maw 700
-               :pb :xl}
-     [title/h3 "Basic Information"]
-     [:> Stack
-      [forms/input-field
-       {:label "Name"
-        :onChange #(reset! proxy-info-name (-> % .-target .-value))
-        :defaultValue @proxy-info-name}]
-      [forms/textarea-field
-       {:label "Description"
-        :placeholder "(Optional) Describe this Proxy purpose"
-        :onChange #(reset! proxy-info-description (-> % .-target .-value))
-        :defaultValue @proxy-info-description}]
-      [forms/input-field
-       {:label "Target URL"
-        :onChange #(reset! proxy-info-target-url (-> % .-target .-value))
-        :defaultValue @proxy-info-target-url}]
-      [forms/input-field
-       {:label "Host URL"
-        :onChange #(reset! proxy-info-host-url (-> % .-target .-value))
-        :defaultValue @proxy-info-host-url}]
-      [:> Group {:align :end
-                 :justify :end}
-       [button/primary
-        {:text "Save"
-         :on-click #(rf/dispatch [:proxies->update
-                                  (:id info)
-                                  {:name @proxy-info-name
-                                   :description @proxy-info-description
-                                   :host-url @proxy-info-host-url
-                                   :target-url @proxy-info-target-url}])}]]]])))
+    (fn [info]
+      [:> Stack {:maw 700
+                 :pb :xl}
+       [title/h3 "Basic Information"]
+       [:> Stack
+        [forms/input-field
+         {:label "Name"
+          :onChange #(reset! proxy-info-name (-> % .-target .-value))
+          :defaultValue @proxy-info-name}]
+        [forms/textarea-field
+         {:label "Description"
+          :placeholder "(Optional) Describe this Proxy purpose"
+          :onChange #(reset! proxy-info-description (-> % .-target .-value))
+          :defaultValue @proxy-info-description}]
+        [:> Group {:align :end
+                   :justify :end}
+         [button/primary
+          {:text "Save"
+           :on-click #(rf/dispatch [:proxies->update
+                                    (:id info)
+                                    {:name @proxy-info-name
+                                     :description @proxy-info-description}])}]]]])))
 
 (defn main [proxy-id]
   (let [proxy-info (rf/subscribe [:proxies->proxy-info])]
@@ -119,6 +148,8 @@
           "Proxy Settings"]
          [:> Stack
           [basic-info (:data @proxy-info)]
+          [:> Divider]
+          [networking-info (:data @proxy-info)]
           [:> Divider]
           [proxy-keys (:data @proxy-info)]
           [:> Divider]

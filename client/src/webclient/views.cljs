@@ -3,7 +3,7 @@
     [re-frame.core :as rf]
     [bidi.bidi :as bidi]
     ["@mantine/core" :refer [MantineProvider createTheme
-                             Container NavLink]]
+                             Container MantineColorsTuple]]
     ["@mantine/notifications" :refer [Notifications]]
     [webclient.styles :as styles]
     [webclient.events.core]
@@ -82,21 +82,28 @@
 (defmethod routes/panels :default []
   [application/layout [:div "404 Not Found"]])
 
+(def ^MantineColorsTuple gray-tuple [
+  "#f1f4fe",
+  "#e4e6ed",
+  "#c8cad3",
+  "#a9adb9",
+  "#9094a3",
+  "#7f8496",
+  "#777c91",
+  "#656a7e",
+  "#595e72",
+  "#4a5167"
+])
+
 (def mantine-theme
-  #js {:defaultRadius "md"
-       :primaryColor "gray"
-       :headings (clj->js {:sizes {:h3 {:fontWeight "400"}}})
-       :white "#FAFAFA"
-       :black "#363738"
-       :cursorType :pointer
-       :components {"NavLink"
-                    (.extend
-                      NavLink
-                      {:vars (fn [_ props]
-                               (js/console.log "props" props)
-                               (if (= "gray" (.-color props))
-                                 {"root" {"--nl-hover" "var(--mantine-color-gray-8)"}}
-                                 {"root" {"--nl-hover" "red"}}))})}})
+  (clj->js
+    {:defaultRadius :md
+     :primaryColor "gray"
+     :colors {:grayTest gray-tuple}
+     :headings (clj->js {:sizes {:h3 {:fontWeight "400"}}})
+     ;:white "#FAFAFA"
+     :black "#363738"
+     :cursorType :pointer}))
 
 (defn main-panel []
   (let [active-panel (rf/subscribe [:active-panel])
