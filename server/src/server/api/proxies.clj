@@ -84,8 +84,11 @@
     (response {:status "ok"
                :data (proxies/delete-proxy proxy-id
                                            selected-workspace)})))
+
+(def ^:private default-headers-capture-keys
+  '(:duckt-user-sub :duckt-session-id))
+
 (defn set-proxy-alive [req & _]
-  (t/log! :debug "Setting proxy alive")
   (let [context (:proxy-context req)
         proxy-id (:id context)
         selected-workspace (:workspace-id context)
@@ -94,14 +97,24 @@
                               proxy-id
                               "ready"))]
     (t/log! :debug (str "Setting proxy alive for " proxy-id))
-    (println :proxy-config proxy-config)
-    (response {:status "ok"
-               :data {:target_url (:target_url proxy-config)
-                      :description (:description proxy-config)
-                      :request_headers_keys (conj
-                                              (-> proxy-config
-                                                  :request_headers_config :keys)
-                                              :duckt-user-sub)
-                      :response_headers_keys (conj (-> proxy-config
-                                                      :response_headers_config :keys)
-                                                   :content-type)}})))
+    (response
+      {:status "ok"
+       :data {:target_url (:target_url proxy-config)
+              :description (:description proxy-config)
+              :request_headers_config {:keys (flatten
+                                               (conj
+                                                 (-> proxy-config
+                                                     :request_headers_config :keys)
+                                                 default-headers-capture-keys))
+                                       :capture_type (or (-> proxy-config
+                                                             :request_headers_config
+                                                             :capture_type)
+                                                         "partial")}
+              :response_headers_config {:keys (flatten
+                                                (conj (-> proxy-config
+                                                          :response_headers_config :keys)
+                                                      :content-type))
+                                        :capture_type (or (-> proxy-config
+                                                              :response_headers_config
+                                                              :capture_type)
+                                                          "partial")}}})))

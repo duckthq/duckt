@@ -20,23 +20,45 @@
   state (atom {}))
 
 ;; get the keys of the headers from the store and return only the headers in those keys
-(defn get-headers [headers state-keys]
-  (t/log! :debug (str "get-headers: " state-keys))
-  (reduce (fn [acc k]
-            (let [header-value (get headers k)]
-              (when header-value
-                (assoc acc k header-value))))
-          {} state-keys))
+(defmulti get-headers (fn [capture-type _ _] capture-type))
+
+(defmethod get-headers :all [_ headers _]
+  (t/log! :debug "get-headers: all")
+  headers)
+(defmethod get-headers :none [_ & _] {})
+
+(defmethod get-headers :partial [_ headers state-keys]
+  (t/log! :debug "get-headers: default - partial")
+  (reduce
+    (fn [acc k]
+      (if-let [header-value (get headers k)]
+        (assoc acc k header-value)
+        acc))
+    {} state-keys))
+
+;; partial is default
+(defmethod get-headers :default [_ headers state-keys]
+  (get-headers :partial headers state-keys))
 
 (defn save-request! [request response {:keys [start-time]}]
   (t/log! :debug "save-request!")
-  (let [request-data {:type "proxy"
+  (let [req-headers-capture-type (-> @state :request-headers-config :capture_type)
+        req-headers-keys (-> @state :request-headers-config :keys)
+        res-headers-capture-type (-> @state :response-headers-config :capture_type)
+        res-headers-keys (-> @state :response-headers-config :keys)
+        request-data {:type "proxy"
                       :uri (:uri request)
                       :host (:url request)
                       :query-params (:query-string request)
                       :status-code (:status response)
-                      :request-headers (get-headers (:headers request) (:request-headers-keys @state))
-                      :response-headers (get-headers (:headers response) (:response-headers-keys @state))
+                      :request-headers (get-headers
+                                         (keyword req-headers-capture-type)
+                                         (:headers request)
+                                         req-headers-keys)
+                      :response-headers (get-headers
+                                          (keyword res-headers-capture-type)
+                                          (:headers response)
+                                          res-headers-keys)
                       :method (:request-method request)
                       :created-at start-time
                       :response-time (-> (Instant/now)
@@ -93,8 +115,10 @@
                         (nth splitted-token 2))]
     (build-state {:proxy-id (nth splitted-token 1)
                   :target-url (-> server-config :data :target_url)
-                  :request-headers-keys (-> server-config :data :request_headers_keys)
-                  :response-headers-keys (-> server-config :data :response_headers_keys)
+                  :request-headers-config (-> server-config :data :request_headers_config)
+                  :response-headers-config (-> server-config :data :response_headers_config)
                   :proxy-secret (nth splitted-token 2)})
     (t/log! :info (str "Proxy server started at port " appconfig/proxy-port))
+
+    (println :state @state)
     (start-proxy! (Integer. appconfig/proxy-port) (:target-url @state))))
