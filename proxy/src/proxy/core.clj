@@ -120,5 +120,4 @@
                   :proxy-secret (nth splitted-token 2)})
     (t/log! :info (str "Proxy server started at port " appconfig/proxy-port))
 
-    (println :state @state)
     (start-proxy! (Integer. appconfig/proxy-port) (:target-url @state))))
