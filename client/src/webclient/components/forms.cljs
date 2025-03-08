@@ -21,7 +21,6 @@
                    :variant "filled"
                    :size "md"
                    :description description
-                   :classNames {:input "input-field"}
                    :type type})])
 
 (defn select-field
@@ -65,7 +64,4 @@
                    :variant "filled"
                    :size "md"
                    :multiline true
-                   :description description
-                   :classNames {:input "input-field"}
-                   ;:styles {:input {:backgroundColor "#e1e1e1"}}
-                   })])
+                   :description description})])

@@ -37,7 +37,10 @@
       {:workspace_id workspace-id
        :id proxy-id}
       {:fields [:id :name :description
-                :target_url :host_url :status]})))
+                :created_at :updated_at
+                :target_url :host_url :status
+                :response_headers_config
+                :request_headers_config]})))
 
 (defn update-proxy-status [workspace-id proxy-id status]
   (t/log! :debug (str "Updating proxy status for " proxy-id))
@@ -64,10 +67,10 @@
           {:response_headers_config response-headers-config})
         (when request-headers-config
           {:request_headers_config request-headers-config})
-        {:name name
-         :description description
-         :target_url target-url
-         :host_url host-url})
+        (when name {:name name})
+        (when description {:description description})
+        (when target-url {:target_url target-url})
+        (when host-url {:host_url host-url}))
       {:where [:and
                [:= :id proxy-id]
                [:= :workspace_id workspace-id]]

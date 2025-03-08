@@ -2,6 +2,7 @@
   (:require
     [ring.util.response :refer [response]]
     [buddy.hashers :as buddy]
+    [cheshire.core :as json :refer [generate-string]]
     [crypto.random :as random]
     [server.models.proxies :as proxies]
     [taoensso.telemere :as t]))
@@ -70,9 +71,9 @@
                  (when-let [name (:name body)] {:name name})
                  (when-let [description (:description body)] {:description description})
                  (when-let [request-headers-config (:request-headers-config body)]
-                   {:request-headers-config request-headers-config})
+                   {:request-headers-config (generate-string request-headers-config)})
                  (when-let [response-headers-config (:response-headers-config body)]
-                   {:response-headers-config response-headers-config})
+                   {:response-headers-config (generate-string response-headers-config)})
                  (when-let [target-url (:target-url body)] {:target-url target-url})
                  (when-let [host-url (:host-url body)] {:host-url host-url})))})))
 

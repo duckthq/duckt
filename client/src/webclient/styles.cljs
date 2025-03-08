@@ -4,15 +4,11 @@
 
 (def anchor
   [:.anchor {:color "#368951"}])
-(def input-field
-  [:.input-field {:background-color "#e9e9e9"}
-   [:&::placeholder {:color "#777"}]])
 (def sidebar
   [:.sidebar {:position "fixed"
               :top "0"
               :left "0"
               :width "100%"
-              :border-right "1px solid var(--mantine-color-gray-1)"
               :max-width "250px"
               :height "100vh"}
    [:.sidebar-content {:height "100vh"
@@ -34,8 +30,7 @@
     (.appendChild head style-el)))
 
 (defn build-styles []
-  (let [styles (css [input-field
-                     sidebar
+  (let [styles (css [sidebar
                      topbar
                      anchor])]
     (mount-style styles)))
