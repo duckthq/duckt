@@ -2,7 +2,8 @@
   (:require
     [re-frame.core :as rf]
     [reagent.core :as r]
-    ["@mantine/core" :refer [Paper Stack Group Divider Tooltip Button Radio Text]]
+    ["@mantine/core" :refer [Paper Stack Group Divider Tooltip Button Radio Text
+                             TextInput TagsInput Button]]
     ["@tabler/icons-react" :refer [IconInfoCircle]]
     [webclient.components.ui.title :as title]
     [webclient.components.forms :as forms]
@@ -71,44 +72,120 @@
     (finally (rf/dispatch [:proxies->clean-swapped-key-from-memory]))))
 
 (defn- networking-info [info]
-  (let [proxy-info-target-url (r/atom (:target_url info))]
+  (let [proxy-info-target-url (r/atom (:target_url info))
+        capture-type-radio-values [{:label "Partial" :value "partial"
+                                    :description (str "Capture only the default Duckt headers and "
+                                                      "the fields you specify in the configuration.")}
+                                   {:label "Full" :value "full"
+                                    :description (str "Capture all headers and fields sent by the client. "
+                                                      "This includes sensitive information like passwords.")}
+                                   {:label "None" :value "none"
+                                    :description (str "Do not capture any data. "
+                                                      "This is useful for testing the proxy without capturing any data.")}]
+        response-capture-type-value (r/atom (or (-> info :response_headers_config :type) "partial"))
+        request-capture-type-value (r/atom (or (-> info :request_headers_config :type) "partial"))
+        request-headers-items (r/atom (or (-> info :request_headers_config :keys) []))
+        response-headers-items (r/atom (or (-> info :response_headers_config :keys) []))]
     (fn [info]
-      [:> Stack {:maw 700
-                 :pb :xl}
-       [title/h3 "Networking configuration"]
-       [:> Stack
-        [forms/input-field
-         {:label "Target URL"
-          :onChange #(reset! proxy-info-target-url (-> % .-target .-value))
-          :defaultValue @proxy-info-target-url}]
-        [:> Radio.Group
-         {:value "partial"
-          :onChange #(println %)}
-         [:> Stack {:gap :xs}
-          [:> Radio.Card
-           {:value "partial"
-            :p :sm}
-           [:> Group {:align :flex-start}
-            [:> Radio.Indicator]
-            [:> Stack {:gap :xs}
-             [:> Text "Partial"]
-             [:> Text {:size :md
-                       :color :dimmed}
-              "Proxy only requests that match the target URL will be forwarded."]]]]
-          [:> Radio.Card
-           {:value "full"}
-           [:> Stack
-            [text/Base {:fw 600} "Full"]
-            [text/Dimmed {:size :md}
-             "All requests will be forwarded to the target URL."]]]]]
+      (let [save (fn []
+                   (rf/dispatch [:proxies->update
+                                 (:id info)
+                                 {:target-url @proxy-info-target-url
+                                  :request-headers-config {:type @request-capture-type-value
+                                                           :keys @request-headers-items}
+                                  :response-headers-config {:type @response-capture-type-value
+                                                            :keys @response-headers-items}}]))]
+        [:> Stack {:maw 700
+                   :pb :xl}
+         [title/h3 "Networking configuration"]
+         [:> Stack {:gap :xl}
+          [:> TextInput
+           {:label "Target URL"
+            :description "The URL of the server that will receive the requests"
+            :onChange #(reset! proxy-info-target-url (-> % .-target .-value))
+            :defaultValue @proxy-info-target-url}]
 
-        [:> Group {:align :end
-                   :justify :end}
-         [button/primary
-          {:text "Save"
-           :on-click #(rf/dispatch [:proxies->update
-                                    (:id info)
-                                    {:target-url @proxy-info-target-url}])}]]]])))
+          [:> Stack
+           [title/h4 "Request headers"]
+           [:> Radio.Group
+            {:value @request-capture-type-value
+             :label "Capture type"
+             :description (str "Choose how you want to capture the request headers "
+                               "of each request")
+             :onChange #(reset! request-capture-type-value %)}
+            [:> Group {:wrap "nowrap"
+                       :pt :md
+                       :align :start
+                       :justify "stretch"
+                       :grow 1}
+             (doall
+               (for [capture-type capture-type-radio-values]
+                 ^{:key (:value capture-type)}
+                 [:> Radio.Card
+                  {:value (:value capture-type)
+                   :withBorder false
+                   :h "100%"
+                   :checked (= @request-capture-type-value (:value capture-type))
+                   :p :sm}
+                  [:> Stack {:gap :xs}
+                   [:> Group {:wrap :nowrap}
+                    [:> Radio.Indicator]
+                    [:> Text (:label capture-type)]]
+                   [:> Text {:size :sm
+                             :color :dimmed}
+                    (:description capture-type)]]]))]]
+           [:> TagsInput {:label "Request headers"
+                          :description "The headers you want to capture from the request"
+                          :disabled (not= @request-capture-type-value "partial")
+                          :value (if (= @request-capture-type-value "partial")
+                                   @request-headers-items
+                                   [])
+                          :onChange #(reset! request-headers-items %)
+                          :placeholder "Enter header key"}]]
+
+          [:> Stack
+           [title/h4 "Response headers"]
+           [:> Radio.Group
+            {:value @response-capture-type-value
+             :label "Capture type"
+             :description (str "Choose how you want to capture the response headers "
+                               "of each request")
+             :onChange #(reset! response-capture-type-value %)}
+            [:> Group {:wrap "nowrap"
+                       :pt :md
+                       :align :start
+                       :justify "stretch"
+                       :grow 1}
+             (doall
+               (for [capture-type capture-type-radio-values]
+                 ^{:key (:value capture-type)}
+                 [:> Radio.Card
+                  {:value (:value capture-type)
+                   :withBorder false
+                   :h "100%"
+                   :checked (= @response-capture-type-value (:value capture-type))
+                   :p :sm}
+                  [:> Stack {:gap :xs}
+                   [:> Group {:wrap :nowrap}
+                    [:> Radio.Indicator]
+                    [:> Text (:label capture-type)]]
+                   [:> Text {:size :sm
+                             :color :dimmed}
+                    (:description capture-type)]]]))]]
+           [:> TagsInput {:label "Response headers"
+                          :description "The headers you want to capture from the response"
+                          :disabled (not= @response-capture-type-value "partial")
+                          :value (if (= @response-capture-type-value "partial")
+                                   @response-headers-items
+                                   [])
+                          :onChange #(reset! response-headers-items %)
+                          :placeholder "Enter header key"}]]
+
+          [:> Group {:align :end
+                     :justify :end}
+           [:> Button
+            {:onClick save}
+            "Save"]]]]))))
 
 
 (defn- basic-info [info]

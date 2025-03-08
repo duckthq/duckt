@@ -98,10 +98,10 @@
 (def mantine-theme
   (clj->js
     {:defaultRadius :md
-     :primaryColor "gray"
+     :primaryColor :dark
      :colors {:grayTest gray-tuple}
      :headings (clj->js {:sizes {:h3 {:fontWeight "400"}}})
-     ;:white "#FAFAFA"
+     :white "#FAFAFA"
      :black "#363738"
      :cursorType :pointer}))
 
