@@ -24,8 +24,12 @@
                               (parse-long limit)
                               50)
                      :offset (or (get query-params "offset") 0)
-                     :order-by (or (get query-params "order_by") :joined_at)
-                     :order (or (get query-params "order") :desc)})]
+                     :order-by (if-let [order-by (get query-params "order_by")]
+                                 (keyword order-by)
+                                 :joined_at)
+                     :order (if-let [order (get query-params "order")]
+                              (keyword order)
+                              :desc)})]
     (generate-string
       {:status "ok"
        :data customers})))
