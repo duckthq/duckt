@@ -122,7 +122,8 @@
          [title/page-title "Users settings"]]
         (when (contains? #{"admin" "owner"} (:role @userinfo))
           [button/Primary
-           {:onClick #(rf/dispatch [:modal->open {:content [new-user-modal-content]}])
+           {:onClick #(rf/dispatch [:modal->open {:content [new-user-modal-content]
+                                                  :title "Add new user"}])
             :size :sm
             :leftSection (r/as-element [:> IconUserPlus {:size 16}])}
            "Add user"])]
