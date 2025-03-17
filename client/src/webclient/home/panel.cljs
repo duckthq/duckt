@@ -72,7 +72,6 @@
                                  :transitionDuration 0
                                  :withItemsBorders false
                                  :onChange #(fetch-timeframe %)
-                                 :radius :xl
                                  :fullWidth true}]]]
 
          [:> BarChart {:data (clj->js data)
@@ -88,7 +87,7 @@
                         :series [{:name "all" :color "gray.6"}
                                  {:name "5xx" :color "red.4"}
                                  {:name "4xx" :color "yellow.5"}]
-                        :h 200}]]))))
+                        :h 180}]]))))
 
 (defn customer-list-item [customer]
   [:> Box
@@ -127,13 +126,12 @@
        [:> Stack {:gap :lg}
         [:header
          [h/page-title "Home"]]
-        [:> Grid {:gutter :lg}
-         [:> Grid.Col {:span 8}
-          [:> Paper {:withBorder true
-                     :p :lg}
-           [requests-chart]]]
-         [:> Grid.Col {:span 4
-                       :h "100%"}
-          [:> Paper {:withBorder true
-                     :p :lg}
-           [customers-list (:data @customers)]]]]]])))
+        [:> Group {:gap :lg
+                   :align :stretch
+                   :grow 1}
+         [:> Paper {:withBorder true
+                    :p :lg}
+          [requests-chart]]
+         [:> Paper {:withBorder true
+                    :p :lg}
+          [customers-list (:data @customers)]]]]])))
