@@ -4,7 +4,7 @@
     [reagent.core :as r]
     [clojure.string :as string]
     ["@tabler/icons-react" :refer [IconSearch IconChevronDown IconChartHistogram
-                                   IconHome IconListTree IconUsers]]
+                                   IconHome IconListTree IconSettings IconUsers]]
     ["@mantine/spotlight" :refer [Spotlight spotlight]]
     ["@mantine/core" :refer [Group Avatar TextInput
                              Code Box Menu Group Text]]))
@@ -26,6 +26,14 @@
                    [:> IconUsers {:size 20
                                   :stroke 1.5}])}])
 
+(def spotlight-static-management-actions
+  [{
+    :id "Users Settings",
+    :label "User Settings",
+    :description "Manage everyone in your team",
+    :onClick #(rf/dispatch [:navigate {:handler :user-settings}])
+    :leftSection (r/as-element [:> IconSettings {:size 24 :stroke 1.5}])}])
+
 (defn main []
   (let [is-mac? (rf/subscribe [:is-mac?])
         proxies (rf/subscribe [:proxies])
@@ -42,26 +50,33 @@
                        (.-ctrlKey e)))
           (.open spotlight))))
     (fn []
-      (let [spotlight-actions (flatten (conj spotlight-static-actions
-                                    (mapv
-                                      (fn [p]
-                                        [{:id (str (:id p) "-overview")
-                                         :label (str (:name p) " Overview")
-                                         :description (:description p)
-                                         :onClick #(rf/dispatch [:navigate {:handler :proxy-overview
-                                                                            :params {:proxy-id (:id p)}}])
-                                         :leftSection (r/as-element
-                                                        [:> IconChartHistogram {:size 20
-                                                                                :stroke 2}])}
-                                         {:id (str (:id p) "-requests")
-                                          :label (str (:name p) " Requests")
-                                          :description (:description p)
-                                          :onClick #(rf/dispatch [:navigate {:handler :proxy-requests
-                                                                             :params {:proxy-id (:id p)}}])
-                                          :leftSection (r/as-element
-                                                         [:> IconListTree {:size 20
-                                                                            :stroke 1.5}])}])
-                                      (:data @proxies))))]
+      (println :user @user)
+      (let [spotlight-actions (flatten
+                                (conj
+                                  spotlight-static-actions
+                                  (mapv
+                                    (fn [p]
+                                      [{:id (str (:id p) "-requests")
+                                        :label (str (:name p) " Requests")
+                                        :description (:description p)
+                                        :onClick #(rf/dispatch [:navigate {:handler :proxy-requests
+                                                                           :params {:proxy-id (:id p)}}])
+                                        :leftSection (r/as-element
+                                                       [:> IconListTree {:size 20
+                                                                         :stroke 1.5}])}
+                                       {:id (str (:id p) "-settings")
+                                        :label (str (:name p) " Settings")
+                                        :description (:description p)
+                                        :onClick #(rf/dispatch [:navigate {:handler :proxy-settings
+                                                                           :params {:proxy-id (:id p)}}])
+                                        :leftSection (r/as-element
+                                                       [:> IconSettings {:size 20
+                                                                               :stroke 2}])}])
+                                    (:data @proxies))
+                                  [(remove
+                                     nil?
+                                     (when (contains? #{"admin" "owner"} (:role @user))
+                                       spotlight-static-management-actions))]))]
         [:> Box {:id "topbar"
                  :style {:z-index 2}
                  :top 0

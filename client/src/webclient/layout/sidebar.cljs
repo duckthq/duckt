@@ -100,7 +100,7 @@
                        :leftSection (r/as-element [:> IconAffiliate
                                                     {:size 16
                                                      :stroke "1.5"}])}
-           [:> NavLink {:href (routes/url-for :proxy-overview
+           (comment [:> NavLink {:href (routes/url-for :proxy-overview
                                               {:proxy-id (:id p)})
                         :onClick #(do (rf/dispatch [:requests->get-by-proxy-id (:id p)])
                                       (rf/dispatch [:proxies->set-active-proxy (:id p)]))
@@ -110,7 +110,7 @@
                         :color :gray
                         :leftSection (r/as-element [:> IconChartHistogram
                                                     {:size 16
-                                                     :stroke "1.5"}])}]
+                                                     :stroke "1.5"}])}])
            [:> NavLink {:href (routes/url-for :proxy-requests {:proxy-id (:id p)})
                         :onClick #(do (rf/dispatch [:requests->get-by-proxy-id (:id p)])
                                       (rf/dispatch [:proxies->set-active-proxy (:id p)]))
