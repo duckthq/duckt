@@ -152,17 +152,17 @@
         [:div {:id "sidebar"
                :class "sidebar"}
          [:> Box {:class [:sidebar-content]
-                  :styles {:root {:border-right "1px solid var(--mantine-color-gray-3)"}}
+                  :bg "var(--mantine-color-gray-1)"
                   :h "100%"}
           [:> Stack {:gap 0
-                     :styles {:root {:border-right "1px solid var(--mantine-color-gray-3)"}}
                      :h "100%"}
            [:> Box {:w "150px"
                     :p :md}
-            [:> Image
-             {:src "/images/brand/icon-text.svg"
-              :fit :contain
-              :w "100%"}]]
+            [:> Anchor {:href "/"}
+             [:> Image
+              {:src "/images/brand/icon-text.svg"
+               :fit :contain
+               :w "100%"}]]]
            (comment
              [:> Menu {:shadow :md
                        :withArrow true}

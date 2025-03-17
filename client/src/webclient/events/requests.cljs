@@ -63,6 +63,20 @@
                                          :data (-> db :requests->timeframe :data)})}))
 
 (rf/reg-event-fx
+  :requests->get-timeframes
+  (fn [{:keys [db]} [_ {:keys [status-code-group start-time end-time]}]]
+    {:fetch {:uri "/requests-timeframe"
+             :method "GET"
+             :query-params (merge
+                             (when status-code-group
+                               {:status-code-group status-code-group})
+                             {:start-time start-time
+                              :end-time end-time})
+             :success-fx [:requests->set-timeframe]}
+     :db (assoc db :requests->timeframe {:loading? true
+                                         :data (-> db :requests->timeframe :data)})}))
+
+(rf/reg-event-fx
   :requests->set-timeframe
   (fn [{:keys [db]} [_ requests]]
     {:db (assoc-in db [:requests->timeframe :loading?] false)

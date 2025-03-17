@@ -15,8 +15,8 @@
        -> :proxy-id - the id of the proxy
        -> :target-url - the url of the target server
        -> :proxy-secret - the secret
-       -> :response-headers-keys - the keys of the response headers to store
-       -> :request-headers-keys - the keys of the request headers to store"}
+       -> :response-headers-config - {:keys [header-keys] :type all|none|partial}
+       -> :request-headers-config - {:keys [header-keys] :type all|none|partial}"}
   state (atom {}))
 
 ;; get the keys of the headers from the store and return only the headers in those keys
@@ -101,23 +101,33 @@
                                                    :executor :none
                                                    :raw-stream? true}))
 
-(defn build-state [new-state]
-  (reset! state new-state))
-
-(defn -main []
-  (t/set-min-level! (keyword appconfig/log-level))
-  (t/log! :info "Starting proxy server")
+(defn build-state []
+  (t/log! :info "Building state")
   (let [token (or appconfig/proxy-token
                   (throw (ex-info "Proxy token not set" {})))
         splitted-token (string/split token #":")
         server-config (duckt-server/set-alive!
                         (nth splitted-token 1)
                         (nth splitted-token 2))]
-    (build-state {:proxy-id (nth splitted-token 1)
-                  :target-url (-> server-config :data :target_url)
-                  :request-headers-config (-> server-config :data :request_headers_config)
-                  :response-headers-config (-> server-config :data :response_headers_config)
-                  :proxy-secret (nth splitted-token 2)})
-    (t/log! :info (str "Proxy server started at port " appconfig/proxy-port))
 
-    (start-proxy! (Integer. appconfig/proxy-port) (:target-url @state))))
+    (reset! state {:proxy-id (nth splitted-token 1)
+                   :target-url (-> server-config :data :target_url)
+                   :request-headers-config (-> server-config :data :request_headers_config)
+                   :response-headers-config (-> server-config :data :response_headers_config)
+                   :proxy-secret (nth splitted-token 2)})))
+
+(defn state-updater-chron-job [f]
+  (async/go-loop []
+    (f)
+    (async/<! (async/timeout (* 60 1000)))
+    (recur)))
+
+(defn -main []
+  (t/set-min-level! (keyword appconfig/log-level))
+  (t/log! :info "Starting proxy server")
+  (build-state)
+  (state-updater-chron-job (fn []
+                             (t/log! :info "Updating state")
+                             (build-state)))
+  (t/log! :info (str "Proxy server started at port " appconfig/proxy-port))
+  (start-proxy! (Integer. appconfig/proxy-port) (:target-url @state)))

@@ -152,6 +152,10 @@
          requests/get-one
          {:request-id request-id}))
 
+  (GET "/requests-timeframe" []
+       (routes-handler
+         requests/get-timeframe-requests))
+
   (GET "/endpoints" []
        (routes-handler
          endpoints-ctrl/get-endpoints))

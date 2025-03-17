@@ -25,7 +25,7 @@
     (:body response)))
 
 (defn set-alive! [proxy-id proxy-secret]
-  (t/log! :info "Setting myself alive...")
+  (t/log! :info "Setting proxy configs")
   (let [response (http/post
                   (str appconfig/duckt-server-url "/p/alive")
                   {:accept :json
