@@ -76,7 +76,7 @@
         capture-type-radio-values [{:label "Partial" :value "partial"
                                     :description (str "Capture only the default Duckt headers and "
                                                       "the fields you specify in the configuration.")}
-                                   {:label "Full" :value "full"
+                                   {:label "All" :value "all"
                                     :description (str "Capture all headers and fields sent by the client. "
                                                       "This includes sensitive information like passwords.")}
                                    {:label "None" :value "none"

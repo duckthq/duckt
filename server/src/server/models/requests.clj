@@ -73,6 +73,44 @@
                               :method, :response_time, :created_at]}]
         (pg-honey/find conn :requests query options)))))
 
+(defn get-timeframe-requests
+  [{:keys [workspace-id status-code-group start-time end-time]}]
+  (t/log! :debug (str "Getting requests by proxy id"))
+  (with-open [conn (db/connection)]
+    (pg/with-tx [conn]
+      (let [trunc-unit "hour"
+            interval "1 hour"
+            params {:params [workspace-id start-time end-time trunc-unit]}
+            requests (pg/execute
+                       conn
+                       (str "WITH time_series AS (
+                         SELECT generate_series(
+                           date_trunc($4, $2::timestamp),
+                           date_trunc($4, $3::timestamp),
+                           '" interval "'::interval
+                         ) as time_bucket
+                       )
+                       SELECT
+                         time_series.time_bucket,
+                         COALESCE(count.total, 0) as total
+                       FROM time_series
+                       LEFT JOIN (
+                         SELECT
+                           date_trunc($4, created_at AT TIME ZONE 'UTC') as time_bucket,
+                           count(*) as total
+                         FROM requests
+                         WHERE created_at >= $2
+                         AND created_at <= $3"
+                         (when status-code-group
+                           (str " AND status_code >= " status-code-group "00"
+                                " AND status_code <= " status-code-group "99"))
+                         " AND workspace_id = $1
+                         GROUP BY 1
+                       ) count ON time_series.time_bucket = count.time_bucket
+                       ORDER BY time_series.time_bucket;")
+                       params)]
+        requests))))
+
 (defn get-timeframe-requests-by-proxy
   [{:keys [proxy-id workspace-id status-code-group start-time end-time]}]
   (t/log! :debug (str "Getting requests by proxy id"))

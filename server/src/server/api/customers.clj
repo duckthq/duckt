@@ -20,7 +20,9 @@
                                      (when-not (string/blank? ids)
                                        (map parse-long
                                             (string/split ids #","))))
-                     :limit (or (get query-params "limit") 50)
+                     :limit (if-let [limit (get query-params "limit")]
+                              (parse-long limit)
+                              50)
                      :offset (or (get query-params "offset") 0)
                      :order-by (or (get query-params "order_by") :joined_at)
                      :order (or (get query-params "order") :desc)})]

@@ -31,6 +31,29 @@
                                            "all")
                       :list requests}})))
 
+(defn get-timeframe-requests [req & _]
+  (t/log! :debug "Getting requests by timeframe")
+  (let [context (:context req)
+        query-params (:query-params req)
+        start-time (java.time.Instant/parse (get query-params "start-time"))
+        end-time (java.time.Instant/parse (get query-params "end-time"))
+        status-code-group (when-let [code (get query-params "status-code-group")]
+                             (when-not (string/blank? code)
+                               (parse-long code)))
+        requests (requests/get-timeframe-requests
+                         {:workspace-id (-> context
+                                            :user-preferences
+                                            :selected_workspace)
+                          :status-code-group status-code-group
+                          :start-time start-time
+                          :end-time end-time})]
+    (response {:status "ok"
+               :data {:total (apply + (map :total requests))
+                      :status-code-group (if status-code-group
+                                           (str status-code-group "xx")
+                                           "all")
+                      :list requests}})))
+
 (defn get-requests-by-proxy-id [req params & _]
   (let [context (:context req)
         proxy-id (:proxy-id params)

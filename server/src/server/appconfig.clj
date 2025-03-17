@@ -7,8 +7,8 @@
 
 (def log-level
   (if (System/getenv "LOG_LEVEL")
-    (keyword (System/getenv "LOG_LEVEL"))
-    :info))
+    (System/getenv "LOG_LEVEL")
+    "info"))
 
 (def invite-only?
   (if (System/getenv "INVITE_ONLY")

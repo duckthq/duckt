@@ -1,7 +1,8 @@
 (ns webclient.customers.panel
   (:require
     [re-frame.core :as rf]
-    ["@mantine/core" :refer [Stack Group Box Divider Avatar]]
+    ["@mantine/core" :refer [Stack Group Box Divider Avatar Text]]
+    ["dayjs" :as dayjs]
     [webclient.components.ui.text :as text]
     [webclient.components.ui.title :as title]))
 
@@ -12,14 +13,14 @@
                 :variant :filled
                 :size :sm
                 :name (:sub customer)}]
-    [text/Base {:size :md}
+    [:> Text {:size :sm}
      (:sub customer)]
-    [text/Base {:size :xs}
-     (:last_seen_at customer)]
-    [:> Divider {:orientation :vertical}]
-    [text/Base {:size :xs
-              :color :gray}
-     (:hit_count customer)]]
+    [:> Group {:gap :xs}
+     [:> Text {:size :xs
+               :color :dimmed}
+      "Last time seen:"]
+     [:> Text {:size :xs}
+     (.to (dayjs) (dayjs (:last_seen_at customer)))]]]
    [:> Divider {:variant :dashed}]])
 
 

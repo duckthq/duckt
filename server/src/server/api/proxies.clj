@@ -109,7 +109,7 @@
                                                  default-headers-capture-keys))
                                        :capture_type (or (-> proxy-config
                                                              :request_headers_config
-                                                             :capture_type)
+                                                             :type)
                                                          "partial")}
               :response_headers_config {:keys (flatten
                                                 (conj (-> proxy-config
@@ -117,5 +117,5 @@
                                                       :content-type))
                                         :capture_type (or (-> proxy-config
                                                               :response_headers_config
-                                                              :capture_type)
+                                                              :type)
                                                           "partial")}}})))

@@ -101,7 +101,7 @@
      :primaryColor :dark
      :colors {:grayTest gray-tuple}
      :headings (clj->js {:sizes {:h3 {:fontWeight "400"}}})
-     :white "#FAFAFA"
+     ;:white "#FAFAFA"
      :black "#363738"
      :cursorType :pointer}))
 
@@ -114,7 +114,7 @@
     (fn []
       (println :debug :active-panel @active-panel)
       [:> MantineProvider {:defaultColorScheme @theme
-                           :forceColorScheme :light
+                           :forceColorScheme @theme
                            :theme (createTheme mantine-theme)}
        [:> Notifications]
        [modal/main]

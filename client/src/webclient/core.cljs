@@ -5,6 +5,7 @@
    ["react-dom/client" :refer [createRoot]]
    [re-frame.core :as re-frame]
    ["dayjs/plugin/utc" :as dayjs-utc]
+   ["dayjs/plugin/relativeTime" :as dayjs-relative-time]
    ["dayjs" :as dayjs]
    [webclient.events.core :as events]
    [webclient.routes :as routes]
@@ -13,6 +14,7 @@
 
 ;; extend dayjs to use UTC
 (.extend dayjs dayjs-utc)
+(.extend dayjs dayjs-relative-time)
 
 (defn dev-setup []
   (when config/debug?
