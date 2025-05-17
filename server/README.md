@@ -2,7 +2,7 @@
 
 ## Development
 
-1. Install Leiningen: https://leiningen.org/#docs
+1. Install Clojure: https://clojure.org/guides/install_clojure
 
 2. Install a PostgreSQL with a database named `duckt` and a user `duckt` with password `duckt`
 ```sh
@@ -16,7 +16,15 @@ psql -c "ALTER DATABASE duckt SET timezone TO 'UTC';"
 
 3. Copy the `.env.sample` file to `.env`, it's ready to use with default values, but you can change it if you want.
 
-4. Run the server with `lein run`
+4. Run the REPL with `clojure -M:dev`
+
+    4.1. From inside the REPL, import the dev namespace and start the server:
+    ```clojure
+    (require 'dev)
+    (dev/start)
+    ; option to restart
+    (dev/restart)
+    ```
 
 ## Migrations
 

@@ -1,11 +1,11 @@
 (ns build
   (:require [clojure.tools.build.api :as b]))
 
-(def lib 'duckt-server)
+(def lib 'duckt-proxy)
 (def version "0.0.1-SNAPSHOT")
 (def main 'server.core)
 (def class-dir "target/classes")
-(def uber-file "target/duckt-server-standalone.jar")
+(def uber-file "target/duckt-proxy-standalone.jar")
 
 (def basis (delay (b/create-basis {:project "deps.edn"})))
 
@@ -17,7 +17,7 @@
   (b/copy-dir {:src-dirs ["src" "resources"]
                :target-dir class-dir})
   (b/compile-clj {:basis @basis
-                  :ns-compile '[server.core]
+                  :ns-compile '[proxy.core]
                   :src-dirs ["src"]
                   :class-dir class-dir})
   (b/uber {:class-dir class-dir

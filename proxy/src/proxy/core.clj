@@ -122,12 +122,25 @@
     (async/<! (async/timeout (* 60 1000)))
     (recur)))
 
-(defn -main []
+(defonce server-instance (atom nil))
+
+(defn stop! []
+  (when-let [server @server-instance]
+    (.close server)
+    (reset! server-instance nil)))
+
+(defn start! []
+  (when @server-instance
+    (stop!))
   (t/set-min-level! (keyword appconfig/log-level))
   (t/log! :info "Starting proxy server")
   (build-state)
   (state-updater-chron-job (fn []
                              (t/log! :info "Updating state")
                              (build-state)))
-  (t/log! :info (str "Proxy server started at port " appconfig/proxy-port))
-  (start-proxy! (Integer. appconfig/proxy-port) (:target-url @state)))
+  (let [server (start-proxy! (Integer. appconfig/proxy-port) (:target-url @state))]
+    (reset! server-instance server)
+    (t/log! :info (str "Proxy server started at port " appconfig/proxy-port))))
+
+(defn -main []
+  (start!))

@@ -13,5 +13,5 @@ RUN clojure -T:build uber
 # Runtime stage
 FROM openjdk:21-jdk
 WORKDIR /app
-COPY --from=builder /usr/src/app/target/duckt-server-0.0.1-SNAPSHOT-standalone.jar app.jar
+COPY --from=builder /usr/src/app/target/duckt-server-standalone.jar app.jar
 CMD ["java", "-jar", "app.jar"]
