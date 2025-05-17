@@ -31,8 +31,8 @@
    :release
    {:compiler-options
     {:closure-defines
-     {webclient.config/api-url #shadow/env ["API_URL" "http://localhost:4445"]}}}
+     {webclient.config/api-url #shadow/env ["API_URL" "http://localhost:4444"]}}}
    :dev
    {:compiler-options
     {:closure-defines
-     {webclient.config/api-url #shadow/env ["API_URL" "http://localhost:4445"]}}}}}}
+     {webclient.config/api-url #shadow/env ["API_URL" "http://localhost:4444"]}}}}}}

@@ -1,0 +1,34 @@
+{:deps
+ {org.clojure/clojure {:mvn/version "1.12.0"}
+  org.clojure/core.async {:mvn/version "1.6.681"}
+  buddy/buddy-core {:mvn/version "1.11.423"}
+  buddy/buddy-hashers {:mvn/version "2.0.167"}
+  buddy/buddy-sign {:mvn/version "3.5.351"}
+  crypto-random/crypto-random {:mvn/version "1.2.1"}
+  cider/cider-nrepl {:mvn/version "0.42.1"}
+  ;; db
+  org.postgresql/postgresql {:mvn/version "42.7.5"}
+  com.github.igrishaev/pg2-core {:mvn/version "0.1.17"}
+  com.github.igrishaev/pg2-honey {:mvn/version "0.1.17"}
+  com.github.igrishaev/pg2-migration {:mvn/version "0.1.17"}
+  ;; end db
+  com.taoensso/telemere {:mvn/version "1.0.0-SNAPSHOT"}
+  ;; http stuff
+  http-kit/http-kit {:mvn/version "2.8.0"}
+  clj-http/clj-http {:mvn/version "3.13.0"}
+  cheshire/cheshire {:mvn/version "5.13.0"}
+  compojure/compojure {:mvn/version "1.7.1"}
+  ring/ring-defaults {:mvn/version "0.5.0"}
+  ring/ring-core {:mvn/version "1.9.6"}
+  jumblerg/ring-cors {:mvn/version "3.0.0"}
+  ring/ring-json {:mvn/version "0.5.1"}
+  ring/ring-jetty-adapter {:mvn/version "1.9.6"}}
+
+ :paths ["src" "resources"]
+ :main-opts ["-m" "server.core"]
+ :aliases {:dev {:extra-paths ["dev"]
+                 :extra-deps {nrepl/nrepl {:mvn/version "1.0.0"}
+                              cider/cider-nrepl {:mvn/version "0.42.1"}}
+                 :main-opts ["-m" "nrepl.cmdline" "--interactive" "--port" "7001"]}
+           :build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.7"}}
+                   :ns-default build}}}

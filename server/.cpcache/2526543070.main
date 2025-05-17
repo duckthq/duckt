@@ -1,0 +1,5 @@
+-m
+nrepl.cmdline
+--interactive
+--port
+7001
