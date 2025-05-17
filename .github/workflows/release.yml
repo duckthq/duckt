@@ -9,7 +9,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # Add this line to grant release permissions
+      contents: write
+
     steps:
       - uses: actions/checkout@v4
 
@@ -17,28 +18,30 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'  # Match your Docker runtime now
 
-      - name: Install Clojure Tools
+      - name: Install Clojure CLI
         uses: DeLaGuardo/setup-clojure@12.0
         with:
-          lein: '2.10.0'
+          cli: latest
 
       - name: Get version
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
       - name: Build server uberjar
-        run: cd server && lein uberjar
+        run: |
+          cd server
+          clojure -T:build uber
+          mkdir -p ../artifacts
+          cp target/*standalone.jar ../artifacts/server-standalone-${{ env.VERSION }}.jar
 
       - name: Build proxy uberjar
-        run: cd proxy && lein uberjar
-
-      - name: Rename and relocate jar files
         run: |
-          mkdir -p artifacts
-          find server/target/uberjar -name "*-standalone.jar" -exec cp {} artifacts/server-standalone-${{ env.VERSION }}.jar \;
-          find proxy/target/uberjar -name "*-standalone.jar" -exec cp {} artifacts/proxy-standalone-${{ env.VERSION }}.jar \;
+          cd proxy
+          clojure -T:build uber
+          mkdir -p ../artifacts
+          cp target/*standalone.jar ../artifacts/proxy-standalone-${{ env.VERSION }}.jar
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
