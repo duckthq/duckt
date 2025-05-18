@@ -1,11 +1,10 @@
 (ns webclient.endpoints.requests.panel
   (:require
     [re-frame.core :as rf]
-    ["@radix-ui/themes" :refer [Badge Box Table Text
+    ["@radix-ui/themes" :refer [Title Box Table Text
                                 Tooltip]]
     ["dayjs" :as dayjs]
     ["dayjs/plugin/relativeTime" :as relative-time]
-    [webclient.components.h :as h]
     [webclient.routes :as routes]))
 
 (.extend dayjs relative-time)
@@ -26,7 +25,7 @@
     (fn []
       [:div
        [:header {:class "mb-4"}
-        [h/h1 {:text (str (-> @endpoint :data :method)
+        [:> Title {:order 1} {:text (str (-> @endpoint :data :method)
                           " Requests for "
                           (-> @endpoint :data :path))}]]
        [:> Box

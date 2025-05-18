@@ -3,9 +3,9 @@
     [re-frame.core :as rf]
     [reagent.core :as r]
     ["@mantine/core" :refer [Stack Group Badge Table Paper Box
-                             Code Avatar]]
+                             Code Avatar Title]]
     ["@tabler/icons-react" :refer [IconArrowBack]]
-    [webclient.components.ui.title :as title]
+    [webclient.components.h :as title]
     [webclient.components.ui.anchor :as anchor]
     [webclient.components.ui.text :as text]
     [webclient.routes :as routes]))
@@ -111,11 +111,11 @@
            [:> Group {:gap :xl
                       :align :start}
             [:> Stack
-             [title/h3 "Overview"]
+             [:> Title {:order 3} "Overview"]
              [basic-info-table (:data @request)]]
             (when (-> @request :data :customer_sub)
               [:> Stack {:grow "true"}
-               [title/h3 "User information"]
+               [:> Title {:order 3} "User information"]
                [:> Box {:pos :relative}
                 [:> Group
                  [:> Avatar {:color "initials"
@@ -126,12 +126,12 @@
                              :name (-> @request :data :customer_sub)}]
                  [text/Base (-> @request :data :customer_sub)]]]])]
            [:> Stack
-            [title/h3 "Query parameters"]
+            [:> Title {:order 3} "Query parameters"]
             [query-params-table (-> @request :data :query_params)]]
            [:> Stack
-            [title/h3 "Request headers"]
+            [:> Title {:order 3} "Request headers"]
             [headers-table (-> @request :data :request_headers)]]
            [:> Stack
-            [title/h3 "Response headers"]
+            [:> Title {:order 3} "Response headers"]
             [headers-table (-> @request :data :response_headers)]]
            ])]])))

@@ -2,7 +2,7 @@
   (:require
     [re-frame.core :as rf]
     [bidi.bidi :as bidi]
-    ["@mantine/core" :refer [MantineProvider createTheme
+    ["@mantine/core" :refer [MantineProvider createTheme rem
                              Container MantineColorsTuple]]
     ["@mantine/notifications" :refer [Notifications]]
     [webclient.styles :as styles]
@@ -95,14 +95,37 @@
   "#4a5167"
 ])
 
+(defn components-config [theme]
+  (let [forms-size :sm
+        forms-defaults {:variant :default
+                        :size forms-size}]
+    {:Button {:styles
+              {:root {:textTransform "uppercase"
+                      :fontSize "0.875rem"}}
+              :defaultProps {:size forms-size}}
+     :TextInput {:defaultProps (merge {} forms-defaults)}
+     :Select {:defaultProps (merge {} forms-defaults)}
+     :Textarea {:defaultProps (merge {} forms-defaults)}
+     :MultiSelect {:defaultProps (merge {} forms-defaults)}
+     :TagsInput {:defaultProps (merge {} forms-defaults)}}))
+
 (def mantine-theme
   (clj->js
-    {:defaultRadius :md
+    {:defaultRadius :sm
      :primaryColor :dark
      :colors {:grayTest gray-tuple}
-     :headings (clj->js {:sizes {:h3 {:fontWeight "400"}}})
+     :fontFamily "IBM Plex Sans, sans-serif"
+     :fontFamilyMonospace "IBM Plex Mono, monospace"
+     :headings {:fontWeight "300"
+                :sizes {:h1 {:fontSize (rem 48)}
+                        :h2 {:fontSize (rem 42)}
+                        :h3 {:fontSize (rem 36)}
+                        :h4 {:fontSize (rem 32)}
+                        :h5 {:fontSize (rem 28)}
+                        :h6 {:fontSize (rem 24)}}}
      ;:white "#FAFAFA"
      :black "#363738"
+     :components (components-config nil)
      :cursorType :pointer}))
 
 (defn main-panel []

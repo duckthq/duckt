@@ -3,8 +3,7 @@
     [re-frame.core :as rf]
     ["@mantine/core" :refer [Stack Group Box Divider Avatar Text]]
     ["dayjs" :as dayjs]
-    [webclient.components.ui.text :as text]
-    [webclient.components.ui.title :as title]))
+    [webclient.components.h :as title]))
 
 (defn- customer-list-item [customer proxy-id]
   [:> Box

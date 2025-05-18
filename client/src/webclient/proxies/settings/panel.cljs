@@ -3,18 +3,18 @@
     [re-frame.core :as rf]
     [reagent.core :as r]
     ["@mantine/core" :refer [Paper Stack Group Divider Tooltip Button Radio Text
-                             TextInput TagsInput Button]]
+                             TextInput TagsInput Button Title]]
     ["@tabler/icons-react" :refer [IconInfoCircle]]
-    [webclient.components.ui.title :as title]
     [webclient.components.forms :as forms]
+    [webclient.components.h :as title]
     [webclient.components.button :as button]
     [webclient.components.ui.text :as text]))
 
 (defn- danger-zone [proxy-id]
   [:> Stack {:pb :xl}
-   [title/h3 "Danger Zone"]
+   [:> Title {:order 3} "Danger Zone"]
    [:> Stack {:gap :xs}
-    [title/h5 "Delete Proxy"]
+    [:> Title {:order 5} "Delete Proxy"]
     [text/Dimmed {:size :md}
      "This action cannot be undone. This will permanently delete the proxy and all its data."]]
    [:> Group
@@ -27,7 +27,7 @@
 (defn- swap-key-confirmation [proxy-id]
   [:> Stack
    [:> Stack {:gap :xs}
-    [title/h5 "Are you sure you want to swap the key?"]
+    [:> Title {:order 5} "Are you sure you want to swap the key?"]
     [text/Dimmed {:size :md}
      "This action cannot be undone. This will invalidate the current key and generate a new one."]]
    [:> Group {:justify :end}
@@ -43,7 +43,7 @@
   (declare swapped-key)
   (r/with-let [swapped-key (rf/subscribe [:proxies->swapped-key])]
     [:> Stack
-     [title/h3 "Authentication"]
+     [:> Title {:order 3} "Authentication"]
      [:> Group
       [:> Paper {:p :md
                  :withBorder true}
@@ -97,7 +97,7 @@
                                                             :keys @response-headers-items}}]))]
         [:> Stack {:maw 700
                    :pb :xl}
-         [title/h3 "Networking configuration"]
+         [:> Title {:order 3} "Networking configuration"]
          [:> Stack {:gap :xl}
           [:> TextInput
            {:label "Target URL"
@@ -106,7 +106,7 @@
             :defaultValue @proxy-info-target-url}]
 
           [:> Stack
-           [title/h4 "Request headers"]
+           [:> Title {:order 3} "Request headers"]
            [:> Radio.Group
             {:value @request-capture-type-value
              :label "Capture type"
@@ -144,7 +144,7 @@
                           :placeholder "Enter header key"}]]
 
           [:> Stack
-           [title/h4 "Response headers"]
+           [:> Title {:order 4} "Response headers"]
            [:> Radio.Group
             {:value @response-capture-type-value
              :label "Capture type"
@@ -194,7 +194,7 @@
     (fn [info]
       [:> Stack {:maw 700
                  :pb :xl}
-       [title/h3 "Basic Information"]
+       [:> Title {:order 3} "Basic Information"]
        [:> Stack
         [forms/input-field
          {:label "Name"

@@ -1,12 +1,11 @@
 (ns webclient.auth.signup
   (:require
-    ["@mantine/core" :refer [Box Text Stack Container Group Image]]
+    ["@mantine/core" :refer [Box Text Stack Container Group Title Image]]
     [clojure.string :as string]
     [reagent.core :as r]
     [re-frame.core :as rf]
     [webclient.routes :as routes]
     [webclient.components.forms :as forms]
-    [webclient.components.ui.title :as title]
     [webclient.components.button :as button]))
 
 (defn panel []
@@ -38,7 +37,7 @@
            {:src "/images/brand/icon-green-white.svg"
             :fit true}]]
          [:> Stack {:gap "xs"}
-          [title/h3 "Create your account"]
+          [:> Title {:order 3} "Create your account"]
           [:> Text {:color "gray"}
            "Welcome to a new way of seeing your data."]]
          [:form {:on-submit on-submit}

@@ -2,14 +2,13 @@
   (:require
     [reagent.core :as r]
     [re-frame.core :as rf]
-    ["@mantine/core" :refer [Stack Group Paper Code Tabs Accordion Box Table Timeline Text]]
+    ["@mantine/core" :refer [Stack Group Paper Code Tabs Accordion Box Table Timeline Title]]
     ["@tabler/icons-react" :refer [IconBrandDocker IconExternalLink IconCpu
                                    IconBrandGithubFilled IconDownload IconTerminal]]
     ["js-confetti" :as JSConfetti]
-    [webclient.components.h :as h]
     [webclient.components.clipboard :as clipboard]
-    [webclient.components.ui.title :as title]
     [webclient.components.ui.text :as text]
+    [webclient.components.h :as h]
     [webclient.components.ui.anchor :as anchor]))
 
 (defn docker-installation []
@@ -51,7 +50,7 @@
                  [:> Table.Th "PROXY_TOKEN"]
                  [:> Table.Td (:proxy-key proxy-info)]]]]
               [:> Stack
-               [h/h5 "You may also run the container locally"]
+               [:> Title {:order 5} "You may also run the container locally"]
                [:> Paper {:withBorder true
                           :p :md}
                 [:> Group
@@ -112,7 +111,7 @@
                                         [:> IconBrandDocker
                                          {:size 24
                                           :stroke 1}])}
-          [title/h3 "Docker"]]
+          [:> Title {:order 3} "Docker"]]
          [:> Accordion.Panel [docker-installation @new-proxy-info]]]
 
         [:> Accordion.Item {:value "Bare Metal"}
@@ -120,5 +119,5 @@
                                         [:> IconCpu
                                          {:size 24
                                           :stroke 1}])}
-          [title/h3 "Bare Metal"]]
+          [:> Title {:order 3} "Bare Metal"]]
          [:> Accordion.Panel [bare-metal-installation @new-proxy-info]]]]])))

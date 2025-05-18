@@ -6,7 +6,7 @@
                              Button Paper]]
     ["@tabler/icons-react" :refer [IconUserPlus]]
     [webclient.components.ui.text :as text]
-    [webclient.components.ui.title :as title]
+    [webclient.components.h :as title]
     [webclient.components.button :as button]
     [webclient.components.forms :as forms]))
 

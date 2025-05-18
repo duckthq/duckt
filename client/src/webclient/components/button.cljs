@@ -6,14 +6,12 @@
 (defn- base [props text]
   [:> Button (merge
                props
-               {:type (or (:type props) "button")
-                :size (or (:size props) :md)})
+               {:type (or (:type props) "button")})
    text])
 
 (defn Primary
   ([props el]
-   [base (merge props {:variant :filled
-                       :color :dark})
+   [base (merge props {})
     el])
   ([el] [Primary {} el]))
 
@@ -31,8 +29,6 @@
                {:variant "filled"
                 :onClick on-click
                 :type (or type "button")
-                :size "md"
-                :color "dark"
                 :loading loading}
                (when full? {:fullWidth true}))
    text])
@@ -43,8 +39,6 @@
                {:variant "light"
                 :onClick on-click
                 :type (or type "button")
-                :size "md"
-                :color "dark"
                 :loading loading}
                (when full? {:fullWidth true}))
    text])
@@ -54,8 +48,6 @@
                {:variant "subtle"
                 :onClick on-click
                 :type (or type "button")
-                :size "md"
-                :color "dark"
                 :loading loading}
                (when leftSection
                  {:leftSection (r/as-element [:> leftSection

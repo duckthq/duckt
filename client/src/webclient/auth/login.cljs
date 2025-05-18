@@ -2,10 +2,9 @@
   (:require
     [re-frame.core :as rf]
     [reagent.core :as r]
-    ["@mantine/core" :refer [Box Text Stack Container Group Image]]
+    ["@mantine/core" :refer [Box Text Stack Container Group Image Title]]
     [webclient.routes :as routes]
     [webclient.components.forms :as forms]
-    [webclient.components.ui.title :as title]
     [webclient.components.button :as button]))
 
 (defn panel []
@@ -26,7 +25,7 @@
            {:src "/images/brand/icon-green-white.svg"
             :fit true}]]
          [:> Stack {:gap "xs"}
-          [title/h3 "Login to Duckt"]
+          [:> Title {:order 3} "Login to Duckt"]
           [:> Text {:color "gray"}
            "Welcome to a new way of seeing your data."]]
          [:form {:on-submit on-submit}

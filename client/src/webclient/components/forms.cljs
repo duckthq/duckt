@@ -18,8 +18,6 @@
                    :label label
                    :defaultValue defaultValue
                    :name input-name
-                   :variant "filled"
-                   :size "md"
                    :description description
                    :type type})])
 
@@ -41,8 +39,6 @@
                 :data data
                 :name input-name
                 :defaultValue defaultValue
-                :variant :filled
-                :size (or size :md)
                 :description description
                 :options options})])
 
@@ -61,7 +57,4 @@
                    :label label
                    :name input-name
                    :defaultValue defaultValue
-                   :variant "filled"
-                   :size "md"
-                   :multiline true
                    :description description})])
