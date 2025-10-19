@@ -2,6 +2,8 @@
 .clj-kondo
 .lsp
 .env
+.cpcache
+.nrepl-port
 
 client/node_modules/
 client/resources/public/js/compiled

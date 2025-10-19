@@ -1,6 +1,6 @@
 {:deps {org.clojure/clojure {:mvn/version "1.11.1"}
         cider/cider-nrepl {:mvn/version "0.42.1"}
-        aleph/aleph {:mvn/version "0.8.2"}
+        aleph/aleph {:mvn/version "0.9.3"}
         manifold/manifold {:mvn/version "0.4.3"}
         org.clojure/core.async {:mvn/version "1.6.681"}
         com.taoensso/telemere {:mvn/version "1.0.0-SNAPSHOT"}
